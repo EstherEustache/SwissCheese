@@ -1,1 +1,0 @@
-"0","res2 <- cube.imput(X = df, KNN = res$KNN[1:k.opt,], PSI = PSI)"
