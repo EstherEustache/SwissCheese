@@ -1,0 +1,4 @@
+"0","devtools::load_all(""M:/Research/subject_1/SwissCheese"")"
+"2","Loading SwissCheese
+"
+"0","knitr::opts_chunk$set(echo = TRUE)"

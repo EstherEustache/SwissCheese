@@ -1,0 +1,172 @@
+#' Compute imputation probabilities
+#'
+#' Compute imputation probabilities matrix that satisfy calibration equations.
+#' Only the \code{K}-Nearest Neighbour of nonrespondent units among respondent units have
+#' non-zero imputation probabilities.
+#'
+#' @param X a data frame with some NA values.
+#' @param KNN a matrix containing in rows the nonrespondent units and in columns the decreasing rank
+#' of the \code{K}-Nearest Neighbour among the respondents units.
+#' @param PSI a vector of initial imputation probabilities (by default NULL). (??? 1/K?)
+#' @param d a vector of sampling weight of all the units.
+#' @param k number of neighbour that are candidate to impute each nonrespondent. If NULL (default), the smaller k
+#' which makes possible to resolve calibration equations is choose.
+#' @param tolerance
+#' @param max.iter maximum number of iterations for each \code{K} to ???.
+#'
+#' @return Returns a list including:
+#' @return \code{K} number of neighbour considerate to make possible to resolve calibration equations.
+#' @return \code{KNN} a matrix containing in rows the nonrespondent units and in columns the decreasing rank
+#' of the \code{K}-Nearest Neighbour among the respondents units, in terms of Euclidean Distance.
+#' @return \code{PSI} a numeric vector containing the nonrespondent units.
+#'
+#' @export
+#'
+#' @examples
+
+calibrate.knn <- function(X, KNN, PSI=NULL, d=NULL, k=NULL, tolerance=0.001, max.iter=2000) {
+  require(pracma)
+  require(sampling)
+
+  # Initialization
+  N  <- nrow(X)
+  J  <- ncol(X)
+  S  <- 1:nrow(X)
+  r  <- 1*!is.na(X)                              # r: matrix of responds
+  nr <- nrow(r[which(rowSums(r) == J),])           # nm: number of respondents
+  R  <- r[which(rowSums(r) != J),]
+  nm <- N - nr
+  Sm <- S[which(rowSums(r) != J)]                  # Sr: units of s_r
+  Sr <- S[which(rowSums(r) == J)]                  # Sm: units of s_m
+  X[is.na(X)] <- 0                             # na are replaced by 0 in order to be able to multiply by R=0
+
+  if (sum(colSums(R)==0)>0) {
+    X <- X[,colSums(R)!=0]
+    R   <- R[,colSums(R)!=0]
+    J   <- ncol(R)
+  } # Don't take account of total non-respondants columns in the Sm unit
+
+  if (is.null(d)) { d <- rep(1, nrow(X)) }
+
+  totauxSm <- colSums(d[Sm] * X[Sm,] * R)                #The variable sums by taking only account of the Sm's units (for calibration)
+  start_time <- Sys.time()
+
+  if (is.null(k)) { K <- 2 } #The algorithm find the best K to calibrate our data
+  else { K <- k }
+  print(K)
+  cvg <- 0
+
+  while (cvg == 0) {
+    cvg <- 1
+
+    # nm must be bigger than K
+    if(K > nr){
+      stop('The algorithm does not converge. K is bigger than the number of respondents.')
+    }
+
+    # ncol(knn) must be bigger than K
+    if(K > ncol(KNN)){ stop('The algorithm does not converge. K is bigger than the number of nearest neighbors in the knn matrix.') }
+
+    knn <- KNN[,1:K]
+
+    # Test if the condition is satisfied (only on variable with NA)
+    index.col                      <- (1:J)[colSums(R)!=nm]
+    R2                             <- R[,index.col]
+    J2                             <- length(index.col)
+    abs.totauxSm                   <- totauxSm[index.col]
+    donor                          <- lapply(1:J2, function(x) unique(as.vector(knn[R2[,x] == 0,]))) # all the possible donors for each variable
+    donor.max                      <- lapply(1:J2, function(x) max(d[unlist(donor[x])]*X[unlist(donor[x]),x])) # select the higgest value for each variable
+    #donor.max[abs.totauxSm < 0]    <- lapply((1:J2)[abs.totauxSm < 0], function(x) -min(X[unlist(donor[x]),x]))
+    #abs.totauxSm[abs.totauxSm < 0] <- -abs.totauxSm[abs.totauxSm < 0]
+    print(colSums(R2)*unlist(donor.max))
+    print(abs.totauxSm)
+    if ( sum(colSums(R2)*unlist(donor.max) < abs.totauxSm) > 1 ) {
+      cvg <- 0
+      K   <- K+1 }
+    print(K)
+  }
+
+  cvg <- 0
+  while (cvg == 0) {
+    cvg <- 1 #If the algorithm does not converge, value of the variable 'cvg' will be 0, and the algorithm will start again with a bigger K.
+    print(K)
+
+    # nm must be bigger than K
+    if(K > nr){
+      stop('The algorithm does not converge. K is bigger than the number of respondents.')
+    }
+
+    # ncol(knn) must be bigger than K
+    if(K > ncol(KNN)){ stop('The algorithm does not converge. K is bigger than the number of nearest neighbors in the knn matrix.') }
+
+    knn <- KNN[,1:K]
+
+    if (is.null(PSI)) { psi <- matrix(rep(1/K, nm*K), c(nm,K)) }  # Initialization of the weights matrix psi just for the nearest neighbors: -> 1/K for each nn
+    else { psi <- PSI[,1:K] }
+
+    # tolerance
+    error      <- rep(1, J)
+    error2     <- rep(1, J)
+    compteur   <- 0
+
+    while (max(error) > tolerance){
+      it <- 1
+      while(it < 10){
+        # Calibration and updating of the psi weigths
+        for (j in 1:J) {
+          knnj     <- knn[R[,j]==1,]   # submatrix of the knn matrix with only the Sm's units which responded to the variable j
+          psij     <- psi[R[,j]==1,]   # submatrix of the psi matrix with only the Sm's units that have responded to the variable j
+          dk       <- d[Sm][R[,j]==1]
+          wij      <- as.numeric(lapply(1:nr, function(x) sum((psij*dk)[knnj == x])))  # dij weigths for each Sr's unit
+
+          # update the psi coefficients for each variable j
+          Ts     <- sum(wij*totauxSm[j])
+          lambda <- 0
+          c      <- 0
+          div    <- 1
+          V      <- var(X[Sr, j])
+          while((div>10^(-10)) & c<100)
+          {
+            c      <- c+1
+            lambda <- lambda-(sum(wij*X[Sr, j]*exp(X[Sr, j]*lambda))-T)/sum(X[Sr, j]*wij*X[Sr, j]*exp(X[Sr, j]*lambda))
+            psi    <- d*X[Sr, j]*exp(X[Sr, j]*lambda)
+            div    <- (sum(wij*X[Sr, j]*exp(X[Sr, j]*lambda))-T)/V
+          }
+          if(c==100) break else g <- exp(lambda*X[Sr, j])
+
+          g[which(is.nan(g))] <- rep(0, length(which(is.nan(g))))
+
+          for (i in 1:nr) {
+            psij[knnj == i] <- psij[knnj == i]*g[i]          # weigths updating only for Sm's units that have responded to the variable j
+          }
+          psi[R[,j]==1,] <- psij
+          psi <- t(apply(psi, 1, function(x) x/sum(x)))
+        }
+        it <- it+1
+      }
+
+      #normalization
+      psi <- t(apply(psi, 1, function(x) x/sum(x)))
+
+      for(j in 1:J){
+        knnj     <- knn[R[,j]==1,]
+        psij     <- psi[R[,j]==1,]                             # normalizes psi matrix with only Sm's units that have responded to the variable j
+        dk       <- d[Sm][R[,j]==1]
+        wij      <- as.numeric(lapply(1:nr, function(x) sum((psij*dk)[knnj == x])))  # wij weigths for each Sr's unit
+        error[j]    <- abs((X[Sr, j] %*% wij - totauxSm[j]) / totauxSm[j])
+      }
+      print(compteur)
+      print(max(error))
+      compteur <- compteur+1
+      if((compteur == max.iter)|(is.null(g))){
+        cvg <- 0
+        K <- K+1
+        break
+      }
+    }
+  }
+  if ((!is.null(k)) && (K>k)) { warning('K must have been bigger.')}
+  execution_time <- Sys.time()-start_time
+  return(list(PSI = psi, K = K, KNN = knn, time = execution_time))
+}
+

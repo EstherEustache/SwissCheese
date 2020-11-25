@@ -1,0 +1,4 @@
+"0","res1  <- calibrate.knn(X = df, d = NULL, KNN = res$KNN, PSI.init = NULL, k = NULL, max.iter = 1000, tolerance = 0.01)"
+"0","k.opt <- res1$k.opt"
+"0","PSI   <- res1$PSI"
+"0","time  <- res1$time"

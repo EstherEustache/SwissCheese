@@ -1,0 +1,268 @@
+library(sampling)
+library(MASS)
+library(FNN)
+#compiler en parallèle
+library(doParallel)
+detectCores()
+cl<-makeCluster(4)
+registerDoParallel(cl)
+getDoParWorkers()
+
+Nb_Nr  <- 100 # pour simulations: nombre de fois qu'on génère la non-réponse
+Nb_NI  <- 100 # pour simulations: nombre de fois qu'on répète l'imputation aléatoire (pour variance due à l'aléatoire de la méthode d'imputation)
+
+# fichier pour les outputs
+chemin <- paste("resultats.txt")
+
+# population et paramètres utilisés pour les simulations. package sampling.
+# pp: probabilités de réponse pour chaque variable
+data(MU284)
+N     <- dim(MU284)[1]
+X_P   <- cbind(MU284[, 2:5], cst=rep(1, N))
+Xtot  <- colSums(X_P)
+J     <- length(Xtot)
+pp    <- cbind(p1 = 1 / (1 + exp(1 - 0.109 * X_P[, 2])),
+          p2 = 1 / (1 + exp(1 - 0.106  * X_P[, 1])),
+          p3 = 1 / (1 + exp(1 - 0.109 * X_P[, 2])),
+          p4 = 1 / (1 + exp(1 - 0.106  * X_P[, 1])),
+          p5 = rep(1, N))
+K     <- 20
+tolerance <- 0.001 # pour le calage. Il se peut qu'il doive être ajusté en fonction des données. À étudier!
+
+# boucle des simulations. On fait Nb_Nr fois la simulation de non-réponse. 
+# pour chaque simulation, on va faire Nb_NI fois l'imputation (plus loin).
+# pour le parallèle, voir documentation
+Boucle_NR <- foreach(iter = 1:Nb_Nr, .combine=rbind) %dopar%
+{
+  library(sampling)
+  library(MASS)
+  library(FNN)
+  library(BalancedSampling)
+  
+  # Matrice de réponse: r
+  # on veut assurer au moins K répondants à chaque variable.
+  nr      <- 1
+  while(nr < K) {
+    r  <- cbind(UPpoisson(pp[,1]), UPpoisson(pp[,2]), UPpoisson(pp[,3]), 
+                UPpoisson(pp[,4]), UPpoisson(rep(1, N)))
+    sr <- (rowSums(r) == J) - 0			# vecteur TRUE si i est dans sr
+    nr <- sum(sr)				            # Nombre de repondants
+  }
+  nm      <- N - nr				          # Nombre de non repondants  
+  unit_sr <- which(sr == 1)         # liste des unités dans s_r
+  unit_sm <- which(sr == 0)         # liste des unités dans s_m
+  
+  # donne les k=K plus proches voisins en ordre du plus proche au moins proche
+  Knn   <- matrix(rep(0, K), nrow = nm, ncol = K)
+  ind   <- 1
+  for (j in unit_sm) {
+    k          <- knn(matrix(r[j, ], nrow=nr, ncol=J, byrow=TRUE) * X_P[sr==1, ], 
+                      X_P[j, ]*r[j, ], c(1:nr), k = K)
+    indices    <- attr(k, "nn.index")
+    Knn[ind, ] <- which(sr == 1)[indices[1, ]]
+    ind        <- ind + 1
+  }
+  
+  # Pour bknni (creation de psi)
+  # il s'agit des psi initiaux (1/K)
+  totauxSm  <- colSums(X_P[sr==0, ] * r[sr==0, ])		# vecteur des totaux chez les non-repondants
+  psi       <- matrix(rep(0, nr*nm), nrow=nr, ncol=nm)
+  for (k in 1:nm) {
+    nnull   <- rep(0, N)
+    nnull[Knn[k, ]] <- rep(1/K, K)
+    psi[, k]        <- nnull[sr==1]
+  }
+  # Setting pour la boucle
+  coef2  <- matrix(rep(0, nr*J), nrow=nr, ncol=J)
+  coef   <- matrix(rep(0, nr*J), nrow=nr, ncol=J)
+  error  <- 10
+  error2 <- 10
+  it     <- 1
+  # for(j in 1:J) : on cale une variable à la fois
+  # while (error2 > tolerance): on le fait jusqu'à une certaine précision (tolerance)
+  #  while (2 == ((error>tolerance)...): on normalise et on répète tout jusqu'à une certaine tolerance
+  while (2 == ((error>tolerance) * 1 + (it < 2000) * 1) ) {
+    while (error2 > tolerance)	{	# Calibrate on the variables until the equations for every variables are satisfied
+      for (j in 1:J)	{		# Calibrate psi for every variables j (once)
+        g <- calib(X_P[sr == 1, j ],
+                   rowSums(psi  %*% diag(r[sr == 0, j])),
+                   totauxSm[j],
+                   q = rep(1, nr),
+                   method = c("raking"),
+                   description = FALSE,
+                   max_iter = 500)
+        g[which(is.nan(g))] <- rep(0, length(which(is.nan(g))))
+        psi  <- (psi %*% diag(r[sr == 0, j])) * g + (psi %*% diag(1 - r[sr == 0, j]))
+      }
+      for (j in 1:J) { coef2[, j] <- rowSums(psi %*% diag(r[sr == 0, j])) }		# A modifier pour eviter boucle?? 
+      tot2   <- colSums(coef2 * X_P[sr == 1, ]) 		# totaux2 donne l'estimation des totaux a chaque iteration. eventuellement on peut supprimer cette ligne en mettant le colSums dans la ligne suivante
+      error2 <- max(abs(tot2 - totauxSm) / totauxSm)		# Le critere que sur l'erreur la plus grande
+    }
+    error2   <- 10											# On reinitialise l'erreur parce qu'on va revenir dans le while2
+    psi      <- sweep(psi, 2, colSums(psi), `/`)							# On divise par la somme de la colonne
+    for (j in 1:J) { coef[, j] <- rowSums(psi %*% diag(r[sr == 0, j])) }			# A modifier pour eviter boucle?? 
+    tot      <- colSums(coef * X_P[sr == 1, ]) 
+    error    <- max(abs(tot - totauxSm) / totauxSm)
+    it       <- it + 1
+  }
+  
+  # Preparation pour balanced k nearest neighbour
+  X_P     <- as.matrix(X_P)
+  Xproba  <- as.vector(psi)
+  XX      <- matrix(as.vector(psi), ncol=J, nrow=nr*nm, byrow=FALSE) * 
+              r[sr==0, ][rep(1:nm, each=nr), ] * X_P[sr==1, ][rep(1:nr, nm), ]
+  Xstrata <- rep.int(1:nm, rep(nr, nm))
+  
+  Estimates_M  <- matrix(rep(0,130*Nb_NI), ncol=130) # il y a 130 résultats par simulation à enregistrer
+  # simulation de Nb_NI fois l'imputation. L'imputation est aléatoire !
+  # le bknni est comparé au random hot deck, knni (k nearest neighbour) et bknni version déterministe (on utilise psi, sans faire phi)
+  for (iter_NI in 1:Nb_NI) {
+    
+    # random hot deck (xImputehotdeck est le jeu de données imputé par random hot deck)
+    hotdeck         <- rep(0, nm)
+    for (j in 1:nm) { hotdeck[j] <- sample(1:nr, 1)  }
+    xImputehotdeck  <- X_P
+    for (j in 1:J)  { xImputehotdeck[r[, j]==0 & sr==0, j] <- X_P[sr==1, j][hotdeck[(r[, j]==0)[sr==0]]] }
+    
+    # Knni
+    Knni            <- rep(0, nm)
+    for (j in 1:nm) { Knni[j] <- sample(Knn[j, ], 1) }
+    xImputeKnni     <- X_P
+    for (j in 1:J)  { xImputeKnni[r[, j]==0 & sr==0, j] <- X_P[Knni[(r[, j]==0 & sr==0)[sr==0]], j] } 
+  
+    # bknni
+    bKnnis          <- balancedstratification2( XX, Xstrata, Xproba, 
+                        comment = FALSE, method = 1, rand = TRUE )
+    bKnni           <- rep(0, nm)
+    for (k in 1:nm) { bKnni[k] <- which(bKnnis[((k-1) * nr + 1):(k * nr)] == 1) }  
+    xImputebKnni    <- X_P
+    for (j in 1:J)  { xImputebKnni[r[, j]==0 & sr==0, j] <- X_P[sr==1, j][bKnni[(r[, j]==0)[sr==0]]] }
+    
+    # bknni deterministic
+    xImputebKnniE   <- X_P
+    for (j in 1:J)  { xImputebKnniE[r[, j]==0 & sr==0, j] <- colSums(matrix(X_P[sr==1, j], ncol=nm, nrow=nr) * psi)[which(r[sr==0, j]==0)] }
+  
+    # pour chaque jeu de données imputé, on estime le total, le 10ieme percentile, la médiane, le 90ieme percentile et la variance de chaque variable
+    # pour la variance, il s'agit de la matrice de variance covariance. 
+    Tot_KNNI     <- colSums(xImputeKnni)[-5]
+    Tot_hotdeck  <- colSums(xImputehotdeck)[-5] 
+    Tot_bKnni    <- colSums(xImputebKnni)[-5] 
+    Tot_BKNNIE   <- colSums(xImputebKnniE)[-5]
+    
+    P10_P        <- apply(X_P,            2, quantile, probs = 0.1)[-5]
+    P10_KNNI     <- apply(xImputeKnni,    2, quantile, probs = 0.1)[-5]
+    P10_hotdeck  <- apply(xImputehotdeck, 2, quantile, probs = 0.1)[-5]
+    P10_bKnni    <- apply(xImputebKnni,   2, quantile, probs = 0.1)[-5]
+    P10_BKNNIE   <- apply(xImputebKnniE,  2, quantile, probs = 0.1)[-5]
+    
+    P50_P        <- apply(X_P,            2, quantile, probs = 0.5)[-5]
+    P50_KNNI     <- apply(xImputeKnni,    2, quantile, probs = 0.5)[-5]
+    P50_hotdeck  <- apply(xImputehotdeck, 2, quantile, probs = 0.5)[-5]
+    P50_bKnni    <- apply(xImputebKnni,   2, quantile, probs = 0.5)[-5]
+    P50_BKNNIE   <- apply(xImputebKnniE,  2, quantile, probs = 0.5)[-5]
+    
+    P90_P        <- apply(X_P,            2, quantile, probs = 0.9)[-5]
+    P90_KNNI     <- apply(xImputeKnni,    2, quantile, probs = 0.9)[-5]
+    P90_hotdeck  <- apply(xImputehotdeck, 2, quantile, probs = 0.9)[-5]
+    P90_bKnni    <- apply(xImputebKnni,   2, quantile, probs = 0.9)[-5]
+    P90_BKNNIE   <- apply(xImputebKnniE,  2, quantile, probs = 0.9)[-5]
+    
+    Vy_P         <- as.vector(cov(X_P)[-5, -5])[c(1, 2, 3, 4, 6, 7, 8, 11, 12, 16)]
+    Vy_KNNI      <- as.vector(cov(xImputeKnni)[-5, -5])[c(1, 2, 3, 4, 6, 7, 8, 11, 12, 16)]
+    Vy_hotdeck   <- as.vector(cov(xImputehotdeck)[-5, -5])[c(1, 2, 3, 4, 6, 7, 8, 11, 12, 16)]
+    Vy_bKnni     <- as.vector(cov(xImputebKnni)[-5, -5])[c(1, 2, 3, 4, 6, 7, 8, 11, 12, 16)]
+    Vy_BKNNIE    <- as.vector(cov(xImputebKnniE)[-5, -5])[c(1, 2, 3, 4, 6, 7, 8, 11, 12, 16)]
+  
+    # on enregistre dans Estimates_M les estimations et les vrais paramètres
+    Estimates <- c(Xtot[-5], Tot_hotdeck, Tot_KNNI, Tot_bKnni, Tot_BKNNIE,
+                  P10_P, P10_hotdeck, P10_KNNI, P10_bKnni, P10_BKNNIE,
+                  P50_P, P50_hotdeck, P50_KNNI, P50_bKnni, P50_BKNNIE,
+                  P90_P, P90_hotdeck, P90_KNNI, P90_bKnni, P90_BKNNIE,
+                  Vy_P,  Vy_hotdeck,  Vy_KNNI,  Vy_bKnni,  Vy_BKNNIE)
+  
+    Estimates_M[iter_NI, ] <- Estimates
+  }
+  return(Estimates_M)
+}
+
+stopCluster(cl)
+
+# fin des simulations
+
+#####
+
+# calcul des biais relatifs et des RMSE monte carlo.
+# sortie dans un fichier .txt
+
+Results_parameter <- function(parameter) {
+  
+  theta_Nsimu <- parameter[ , 1:4]
+  theta       <- theta_Nsimu[1, ]
+  
+  BR_hotdeck  <- (colMeans(parameter[, 5:8])   - theta)
+  BR_KNNI     <- (colMeans(parameter[, 9:12])  - theta) 
+  BR_BKNNI    <- (colMeans(parameter[, 13:16]) - theta) 
+  BR_BKNNI_E  <- (colMeans(parameter[, 17:20]) - theta) 
+  RMSE_hotdeck <- sqrt(colMeans((parameter[, 5:8]   - theta_Nsimu)^2)) 
+  RMSE_KNNI    <- sqrt(colMeans((parameter[, 9:12]  - theta_Nsimu)^2)) 
+  RMSE_BKNNI   <- sqrt(colMeans((parameter[, 13:16] - theta_Nsimu)^2)) 
+  RMSE_BKNNI_E <- sqrt(colMeans((parameter[, 17:20] - theta_Nsimu)^2)) 
+  dd           <- matrix(rep(0,20*Nb_Nr), ncol=20)
+  Nr           <- rep(1:Nb_Nr, each=Nb_NI)
+  for (mr in  1:Nb_Nr) {
+    mean_mr    <- matrix(rep(colMeans(parameter[Nr == mr, ]), Nb_NI), byrow=TRUE, ncol=20)
+    dd[mr, ]   <- colSums((parameter[Nr == mr, ] - mean_mr)^2) / (Nb_NI-1)
+  }
+  RRIV_hotdeck <- sqrt(colMeans(dd[ , 5:8])) 
+  RRIV_KNNI    <- sqrt(colMeans(dd[ , 9:12])) 
+  RRIV_BKNNI   <- sqrt(colMeans(dd[ , 13:16])) 
+  
+  BR   <- round(rbind(BR_hotdeck=BR_hotdeck,     BR_KNNI=BR_KNNI,     BR_BKNNI=BR_BKNNI,     BR_BKNNI_E=BR_BKNNI_E),4)  
+  RMSE <- round(rbind(RMSE_hotdeck=RMSE_hotdeck, RMSE_KNNI=RMSE_KNNI, RMSE_BKNNI=RMSE_BKNNI, RMSE_BKNNI_E=RMSE_BKNNI_E),4)  
+  RRIV <- round(rbind(RRIV_hotdeck=RRIV_hotdeck, RRIV_KNNI=RRIV_KNNI, RRIV_BKNNI=RRIV_BKNNI),4)  
+  return(rbind(BR, RMSE, RRIV))
+}
+
+Totals <- Boucle_NR[ , 1:20]
+P10    <- Boucle_NR[ , 21:40]
+P50    <- Boucle_NR[ , 41:60]
+P90    <- Boucle_NR[ , 61:80]
+Vy     <- Boucle_NR[ , 81:130]
+
+Results_Totals <- Results_parameter(Totals)
+Results_P10    <- Results_parameter(P10)
+Results_P50    <- Results_parameter(P50)
+Results_P90    <- Results_parameter(P90)
+
+theta_Nsimu <- Vy[, 1:10]
+theta       <- theta_Nsimu[1,]
+BR_hotdeck  <- (colMeans(Vy[, 11:20]) - theta)  
+BR_KNNI     <- (colMeans(Vy[, 21:30]) - theta) 
+BR_BKNNI    <- (colMeans(Vy[, 31:40]) - theta)  
+BR_BKNNI_E  <- (colMeans(Vy[, 41:50]) - theta)  
+RMSE_hotdeck  <- sqrt(colMeans((Vy[, 11:20] - theta_Nsimu)^2)) 
+RMSE_KNNI     <- sqrt(colMeans((Vy[, 21:30] - theta_Nsimu)^2)) 
+RMSE_BKNNI    <- sqrt(colMeans((Vy[, 31:40] - theta_Nsimu)^2)) 
+RMSE_BKNNI_E  <- sqrt(colMeans((Vy[, 41:50] - theta_Nsimu)^2)) 
+dd            <- matrix(rep(0,50*Nb_Nr), ncol=50)
+Nr            <- rep(1:Nb_Nr, each=Nb_NI)
+for (mr in  1:Nb_Nr) {
+  mean_mr     <- matrix(rep(colMeans(Vy[Nr == mr, ]), Nb_NI), byrow=TRUE, ncol=50)
+  dd[mr, ]    <- colSums((Vy[Nr == mr, ] - mean_mr)^2) / (Nb_NI-1)
+}
+RRIV_hotdeck  <- sqrt(colMeans(dd[,11:20])) 
+RRIV_KNNI     <- sqrt(colMeans(dd[,21:30])) 
+RRIV_BKNNI    <- sqrt(colMeans(dd[,31:40])) 
+
+BR            <- round(rbind(BR_hotdeck=BR_hotdeck,     BR_KNNI=BR_KNNI,     BR_BKNNI=BR_BKNNI,     BR_BKNNI_E=BR_BKNNI_E),4)  
+RMSE          <- round(rbind(RMSE_hotdeck=RMSE_hotdeck, RMSE_KNNI=RMSE_KNNI, RMSE_BKNNI=RMSE_BKNNI, RMSE_BKNNI_E=RMSE_BKNNI_E),4)  
+RRIV          <- round(rbind(RRIV_hotdeck=RRIV_hotdeck, RRIV_KNNI=RRIV_KNNI, RRIV_BKNNI=RRIV_BKNNI),4)  
+Results_Vy    <-rbind(BR, RMSE, RRIV)
+
+t1 <- Results_Totals
+t2 <- cbind(Results_P10, Results_P50, Results_P90)
+t3 <- Results_Vy
+write.table(cbind(t1,t2,t3), file = chemin, sep="\t", append=TRUE, row.names=FALSE, col.names=FALSE)
+
+
+

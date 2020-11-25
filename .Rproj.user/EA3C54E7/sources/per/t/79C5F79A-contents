@@ -1,0 +1,81 @@
+rm(list=ls())
+library(fastDummies)
+
+
+
+
+X <- read.csv("C:\\Users\\eustachee\\Dropbox\\Eustache_Tille_Vallee\\data\\aa.csv", row.names = NULL)
+X <- X[,-1]
+
+TEST <- rep(0,ncol(X))
+for(i in 1:ncol(X)){
+  TEST[i] <- is.numeric(X[,i])
+}
+
+X[,!TEST] <- dummy_cols(X[,!TEST], remove_first_dummy = TRUE)[,2]
+
+# X <- X[sample(1:2623, 800),]
+
+
+
+res <- swissCheeseImput(X, d = NULL, k = 3, tol = 1e-3, max_iter = 40)
+# res <- swissCheeseImput(X = X1, d = NULL, k = 100, tol = 1e-3, max_iter = 2000)
+colMeans(res)
+apply(X, 2, function(x) mean(na.omit(x)))
+
+
+
+
+
+
+
+
+
+
+
+library(sampling)
+data(MU284)
+X <- cbind(MU284$P85, MU284$P75, MU284$RMT85, MU284$CS82)
+N <- nrow(X)
+J <- ncol(X)
+
+# Matrice de réponse: r
+# on veut assurer au moins K répondants à chaque variable.
+# pp: probabilités de réponse pour chaque variable
+pp <- cbind(p1 = 1 / (1 + exp(1 - 0.109 * X[, 2])),
+            p2 = 1 / (1 + exp(1 - 0.106  * X[, 1])),
+            p3 = 1 / (1 + exp(1 - 0.109 * X[, 2])),
+            p4 = 1 / (1 + exp(1 - 0.106  * X[, 1])))
+K  <- 3
+nr <- 1
+while(nr < K) {
+  r  <- cbind(UPpoisson(pp[,1]), UPpoisson(pp[,2]), UPpoisson(pp[,3]), UPpoisson(pp[,4]))
+  sr <- (rowSums(r) == J) - 0			# vecteur TRUE si i est dans sr
+  nr <- sum(sr)				            # Nombre de repondants
+}
+
+X_NA <- X
+for(i in 1:J){
+  X_NA[r[,i] == 0,i] <- NA
+}
+res2 <- swissCheeseImput(X_NA, d = NULL, k = 3, tol = 1e-3, max_iter = 50)
+
+sum((res2[,1]-X[,1])^2)/N
+
+
+
+
+
+
+
+
+
+
+
+
+A1 <- read.delim("C:\\Users\\eustachee\\switchdrive\\Swiss cheese\\subject_1\\Simulation\\real-estate.txt")
+
+sum(is.na(A1))
+
+
+

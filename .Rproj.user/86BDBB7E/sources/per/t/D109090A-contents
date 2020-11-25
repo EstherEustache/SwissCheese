@@ -1,0 +1,49 @@
+#' K-Nearest Neighbour of nonrespondent units
+#'
+#' Find the K-Nearest Neighbour of nonrespondent units among respondent units, in terms of Euclidean distance.
+#'
+#' @param X a data frame with some NA values.
+#' @param k number of neighbours considered, default value is 30.
+#'
+#' @return Returns a list including:
+#' @return \code{Sm} a numeric vector containing the nonrespondent units.
+#' @return \code{KNN} a matrix containing in rows the nonrespondent units and in columns the decreasing rank
+#' of the K-Nearest Neighbour among the respondents units, in terms of Euclidean Distance.
+#'
+#'
+#' @export
+#'
+#' @examples
+#'
+#'
+ind.knn <- function(X, k=30){
+  require(pracma)
+  require(FNN)
+  require(sampling)
+
+  N  <- nrow(X_p)
+  J  <- ncol(X_p)
+  S  <- 1:nrow(X_p)
+  r  <- 1*!is.na(X_p)                              # r: matrix of responds
+  nr <- nrow(r[which(rowSums(r) == J),])           # nm: number of respondents
+  R  <- r[which(rowSums(r) != J),]
+  nm <- N - nr
+  Sm <- S[which(rowSums(r) != J)]                  # Sr: units of s_r
+  Sr <- S[which(rowSums(r) == J)]                  # Sm: units of s_m
+
+  if ( nm<2 ) { stop('X must have minimum 2 units with NA.') }
+
+  J  <- ncol(X_p)
+  X_p[is.na(X_p)] <- 0                             # na are replaced by 0 in order to be able to multiply by R=0 in line 28
+  X_p.std <- apply(X_p, MARGIN=2, function(x) x/std(x))
+
+  knn <- matrix(rep(0, nm*k), c(nm, k))
+  for (j in 1:nm)
+  {
+    k         <- knn(t(t(X_p.std[Sr,])*R[j,]), X_p.std[Sm[j],]*R[j,], c(1:nr), k=k)
+    knn[j,]   <- attr(k, "nn.index")[1,]
+  }
+
+  return(list(KNN = knn, Sm = Sm))
+}
+

@@ -1,0 +1,5 @@
+"0","res  <- SwissCheese::ind.knn(X = df, k = NULL)"
+"2","Loading required package: FNN
+"
+"0","KNN  <- res$KNN"
+"0","Sr   <- res$Sr"
