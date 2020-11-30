@@ -20,7 +20,7 @@
 #'
 #'
 #'
-#' @examples
+#' @examples  #A faire
 #'
 #'
 #' @export

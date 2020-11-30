@@ -38,9 +38,7 @@
 #'
 #' @seealso \link{indKnn}
 #'
-#'
-#'
-#' @examples
+#' @examples #A faire
 #'
 #' @export
 

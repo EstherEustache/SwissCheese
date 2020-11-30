@@ -37,7 +37,7 @@
 #'
 #' @export
 #'
-#' @examples
+#' @examples #A faire
 #'
 cubeImput <- function(Xr, Xm, knn, psi){
       if ((nrow(psi)!=nrow(knn))&(ncol(psi)!=ncol(knn))) { stop('PSI and knn matrix must have the same dimension.') }

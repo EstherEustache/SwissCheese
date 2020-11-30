@@ -44,7 +44,7 @@
 #'
 #' @seealso \link{indKnn}, \link{calibrateKnn}, \link{cubeImput}, \link{linearImput}
 #'
-#' @examples
+#' @examples  #A faire
 #'
 #' @export
 #'

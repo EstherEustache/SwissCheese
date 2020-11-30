@@ -21,7 +21,7 @@
 #'
 #' @seealso \link{indKnn} and \link{calibrateKnn}
 #'
-#' @examples
+#' @examples  #A faire
 #'
 #'
 linearImput <- function(X, d = NULL, k = NULL, tol = 1e-3, max_iter = 2000){
