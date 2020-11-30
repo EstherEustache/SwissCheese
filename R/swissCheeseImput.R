@@ -17,7 +17,7 @@
 #' @details
 #' First, the \code{k} nearest neighbors of each nonrespondent are chosen in term of Euclidean distance.
 #' Next, imputation probabilities from nearest neighbors of each nonrespondent  are computed satisfying some calibration constraints for all variables simultaneously
-#' and to sum to one for each nonrespondent. The method of calibration is based on four requirements (see function \link{calibrate_knn} and package vignette
+#' and to sum to one for each nonrespondent. The method of calibration is based on four requirements (see function \link{calibrateKnn} and package vignette
 #' to a complete description of the constraints calibration).
 #' Then, the cube method is used to compute the imputation matrix to choose the donors (see (Deville and Tille, 2004)).
 #'

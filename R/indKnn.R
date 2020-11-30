@@ -40,7 +40,7 @@ indKnn <- function(Xr, Xm){
   ##--------------------------
 
   ##---Standardize matrices and replace NA by 0.
-  X_std               <- apply(rbind(Xr, Xm), MARGIN=2, function(x) x/sqrt(1/length(na.omit(x))*sum((na.omit(x)-mean(na.omit(x)))^2)))
+  X_std               <- apply(rbind(Xr, Xm), MARGIN=2, function(x) x/sqrt(1/length(stats::na.omit(x))*sum((stats::na.omit(x)-mean(stats::na.omit(x)))^2)))
   X_std[is.na(X_std)] <- 0
   Xr_std              <- X_std[1:nr,]
   Xm_std              <- X_std[(nr+1):(nm+nr),]

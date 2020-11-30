@@ -7,7 +7,7 @@ Maintainer: <esther.eustache@unine.ch>
 Description: Balanced K-nearest neighbor imputation (Hasler and Tille, 2016) is extended to the treatment of Swiss cheese nonresponse. The method uses random imputations by donors.
 License: What license is it under?
 Suggests: knitr, rmarkdown
-Imports: sampling
+Imports: sampling, BalancedSampling, FNN
 VignetteBuilder: knitr
 Encoding: UTF-8
 LazyData: true

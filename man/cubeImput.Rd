@@ -24,24 +24,6 @@ the dataframe of nonrespondents with NA values imputed.
 Impute missing values with one of the nearest respondents using the cube method.
 }
 \examples{
-df         <- matrix(c(1,2,1,3,2,
-                       NA,3,4,5,2,
-                       1,3,NA,NA,3,
-                       3,2,5,7,8,
-                       5,3,4,2,2,
-                       6,NA,2,2,1,
-                       4,2,4,4,3,
-                       2,5,6,3,7,
-                       1,4,2,3,1,
-                       NA,NA,NA,NA,2), nrow = 10, ncol = 5, byrow = TRUE)
-res        <- indKnn(X = df,  k=5)
-KNN        <- res$KNN
-res1       <- calibrateKnn(X = df, d = NULL, KNN = KNN, PSI.init = NULL, k = NULL, max.iter = 1000, tolerance = 0.01)
-k_opt      <- res3$k_opt
-PSI        <- res3$PSI
-res_imput  <- cubeImput(X = df, PSI = PSI, KNN = KNN[,1:k.opt])
-df_new     <- res_imput$X_imput # df with NA values imputed
-df_new
 
 }
 \references{
@@ -52,7 +34,7 @@ Chauvet, G. and Tille, Y. (2006). A fast algorithm for balanced sampling.
 \emph{Computational Statistics}, 21(1), 53-62.
 }
 \seealso{
-\link{calibrate.knn} and \link[BalancedSampling:flightphase]{BalancedSampling::flightphase}
+\link{calibrateKnn} and \link[BalancedSampling:flightphase]{BalancedSampling::flightphase}
 }
 \author{
 Esther Eustache, \email{esther.eustache@unine.ch}
