@@ -37,6 +37,7 @@ to a complete description of the constraints calibration).
 Then, the cube method is used to compute the imputation matrix to choose the donors (see (Deville and Tille, 2004)).
 }
 \examples{
+ #A faire
 
 }
 \references{

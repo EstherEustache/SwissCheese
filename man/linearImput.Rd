@@ -29,6 +29,7 @@ Returns a list including:
 Impute missing values using the linear imputation.
 }
 \examples{
+ #A faire
 
 
 }

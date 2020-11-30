@@ -40,6 +40,7 @@ and summing to one for each nonrespondent. The method is based on four requireme
 See the package's vignette to a complete description of the calibration constraints.
 }
 \examples{
+#A faire
 
 }
 \seealso{

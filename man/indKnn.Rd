@@ -19,6 +19,7 @@ Find the k-nearest neighbors of nonrespondent units among respondent units, in t
 The function \code{\link[FNN:knn]{knn}} from the package \code{KNN} is used.
 }
 \examples{
+ #A faire
 
 
 }

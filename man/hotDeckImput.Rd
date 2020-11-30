@@ -20,6 +20,7 @@ Impute each nonrespondent unit by selecting randomly a donor among its nearest r
 (see (Andridge and Little, 2004)).
 }
 \examples{
+ #A faire
 
 }
 \seealso{

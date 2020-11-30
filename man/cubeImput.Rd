@@ -24,6 +24,7 @@ the dataframe of nonrespondents with NA values imputed.
 Impute missing values with one of the nearest respondents using the cube method.
 }
 \examples{
+#A faire
 
 }
 \references{
