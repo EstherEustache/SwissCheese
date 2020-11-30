@@ -6,20 +6,11 @@
 #'
 #'
 #' @param Xr a matrix without NA values. The rows correspond to respondent units.
-#'
 #' @param Xm a matrix with at least one NA values on each of its rows. The rows correspond to nonrespondent units.
-#'
 #' @param dr a vector containing the sampling weights of the respondent units in \code{Xr}. If NULL (default), all sampling weights are equal to 1.
-#'
 #' @param dm a vector containing the sampling weights of the nonrespondent units in \code{Xm}. If NULL (default), all sampling weights are equal to 1.
-#'
 #' @param knn a matrix that is returned by the function \code{\link{indKnn}}.
-#'
-#' @param k the number of neighbors that are candidate to impute each nonrespondent. If NULL (default), the smaller k
-#' that makes possible to resolve calibration equations is chosen.
-#'
 #' @param tol a tolerance parameter. Default value is 1e-3.
-#'
 #' @param max_iter the maximum number of iterations to consider convergence.
 #'
 #'
@@ -37,12 +28,7 @@
 #' See the package's vignette to a complete description of the calibration constraints.
 #'
 #'
-#' @return Returns a list including:
-#'
-#' @return \code{knn_final} a matrix that is returned by the function \code{\link{indKnn}}.
-#' If \code{knn} is not null and is to small to converge, \code{knn_final} will consider a larger number of neighbors. Otherwise, \code{knn_final} will be equal to \code{knn}.
-#'
-#' @return \code{psi} a matrix with the same length as \code{knn_final} containing imputation probabilities for each \code{k} neighbors.
+#' @return a matrix with the same length as \code{knn} containing imputation probabilities for each neighbors.
 #'
 #'
 #'
@@ -58,7 +44,7 @@
 #'
 #' @export
 
-calibrateKnn2 <- function(Xr, Xm, dr = NULL, dm = NULL, knn, tol = 1e-2, max_iter = 2000)
+calibrateKnn <- function(Xr, Xm, dr = NULL, dm = NULL, knn, tol = 1e-2, max_iter = 2000)
 {
   ##------------------
   ##  Initialization

@@ -7,26 +7,21 @@
 cubeImput(Xr, Xm, knn, psi)
 }
 \arguments{
-\item{X}{a dataframe with some NA values.}
+\item{Xr}{a matrix without NA values. The rows correspond to respondent units.}
 
-\item{KNN}{a matrix containing in rows the nonrespondent units and in columns the decreasing rank
+\item{Xm}{a matrix with at least one NA values on each of its rows. The rows correspond to nonrespondent units.}
+
+\item{knn}{a matrix containing in rows the nonrespondent units and in columns the decreasing rank
 of the \code{K}-Nearest Neighbour among the respondents units.}
 
-\item{PSI}{a matrix with the same dimension of \code{KNN} contains imputation probabilities of the
+\item{psi}{a matrix with the same dimension of \code{KNN} contains imputation probabilities of the
 \code{K}-Nearest Neighbor of the nonrespondent units.}
 }
 \value{
-Returns a list including:
-
-\code{X_imput} the new dataframe with NA values imputed.
-
-\code{PSI_new} the imputation matrix with the same length of \code{KNN} which contains imputation probabilities equal to 0 or 1.
+the dataframe of nonrespondents with NA values imputed.
 }
 \description{
 Impute missing values with one of the nearest respondents using the cube method.
-}
-\details{
-(cube method)
 }
 \examples{
 df         <- matrix(c(1,2,1,3,2,

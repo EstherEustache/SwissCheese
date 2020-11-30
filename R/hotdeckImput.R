@@ -6,7 +6,6 @@
 #'
 #'
 #' @param X a matrix with NA values. Rows correspond to units.
-#'#'
 #' @param k the number of neighbors considered to impute each nonrespondent. If NULL (default), the minimum between
 #' 30 will be chosen.
 #'
@@ -69,7 +68,7 @@ hotDeckImput <- function(X, k=NULL){
   if(is.null(k)){
     hotdeck  <- sample(1:nr, nm)
   } else {
-    knn      <- indKnn2(Xr, Xm)
+    knn      <- indKnn(Xr, Xm)
     hotdeck  <- apply(knn[,1:k], 1, function(x) sample(x,1))
   }
 

@@ -4,17 +4,14 @@
 #'
 #'
 #'
-#' @param X a dataframe with some NA values.
-#'
-#' @param KNN a matrix containing in rows the nonrespondent units and in columns the decreasing rank
+#' @param Xr a matrix without NA values. The rows correspond to respondent units.
+#' @param Xm a matrix with at least one NA values on each of its rows. The rows correspond to nonrespondent units.
+#' @param knn a matrix containing in rows the nonrespondent units and in columns the decreasing rank
 #' of the \code{K}-Nearest Neighbour among the respondents units.
-#'
-#' @param PSI a matrix with the same dimension of \code{KNN} contains imputation probabilities of the
+#' @param psi a matrix with the same dimension of \code{KNN} contains imputation probabilities of the
 #' \code{K}-Nearest Neighbor of the nonrespondent units.
 #'
 #'
-#'
-#' @details (cube method)
 #'
 #'
 #'
@@ -29,12 +26,7 @@
 #'
 #'
 #'
-#' @return Returns a list including:
-#'
-#' @return \code{X_imput} the new dataframe with NA values imputed.
-#'
-#' @return \code{PSI_new} the imputation matrix with the same length of \code{KNN} which contains imputation probabilities equal to 0 or 1.
-#'
+#' @return the dataframe of nonrespondents with NA values imputed.
 #'
 #'
 #' @author Esther Eustache, \email{esther.eustache@@unine.ch}

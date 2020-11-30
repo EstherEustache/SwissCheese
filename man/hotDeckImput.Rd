@@ -7,8 +7,7 @@
 hotDeckImput(X, k = NULL)
 }
 \arguments{
-\item{X}{a matrix with NA values. Rows correspond to units.
-#'}
+\item{X}{a matrix with NA values. Rows correspond to units.}
 
 \item{k}{the number of neighbors considered to impute each nonrespondent. If NULL (default), the minimum between
 30 will be chosen.}

@@ -21,9 +21,9 @@ that makes possible to satisfying calibration equations will be chosen.}
 \value{
 Returns a list including:
 
-\code{X_imput} the imputed matrix of \code{X}.
+\code{X_new} the imputed matrix of \code{X}.
 
-\code{psi} a matrix containing the imputation probabilities considered to imput NA values with a linear imputation.
+\code{k} the number of neighbors taken into account.
 }
 \description{
 Impute missing values using the linear imputation.
