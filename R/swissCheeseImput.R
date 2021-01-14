@@ -32,7 +32,6 @@
 #'
 #'
 #' @return Returns a list including:
-#'
 #' @return \code{X_new} the imputed matrix of \code{X}.
 #' @return \code{k} the number of neighbors taken into account.
 #'
@@ -44,7 +43,11 @@
 #'
 #' @seealso \link{indKnn}, \link{calibrateKnn}, \link{cubeImput}, \link{linearImput}
 #'
-#' @examples  #A faire
+#' @examples
+#' Xr  <- rbind(c(0.1,0.3,0.4,0.1), c(0.1,0.3,0.2,0.1), c(0.1,0.2,0.3,0.1), c(0.2,0.3,0.2,0.3), c(0.1,0.1,0.2,0.1))
+#' Xm  <- rbind(c(NA,0.1,NA,0.1), c(0.1,NA,0.2,NA))
+#' X <- rbind(Xr,Xm)
+#' swissCheeseImput(X)
 #'
 #' @export
 #'
@@ -147,14 +150,7 @@ swissCheeseImput <- function(X, d = NULL, k = NULL, tol = 1e-3, max_iter = 2000)
   X_strat    <- Xr[as.vector(t(knn_k)),]
   num_strat  <- rep(1:nm, each=k)
   XX         <- matrix(X_psi, ncol=J, nrow=k*nm, byrow=FALSE) * X_strat * R[num_strat,]
-  for(i in 1:max(num_strat)){
-    if(sum(X_psi[num_strat == i]) < (1-1e-6) ){
-      cat('\nProblem with inclusion probabilities in each stratum.\n')
-      stop('break')
-    }
-  }
-  #psi_cube   <- balancedStratification(X = XX, pik = X_psi, stratum = num_strat)
-  psi_cube    <- fbs(cbind(X_psi,XX),as.matrix(num_strat),X_psi)
+  psi_cube   <- fbs(cbind(X_psi,XX),as.matrix(num_strat),X_psi)
 
   #------Imputed matrix
   Xm_init     <- as.matrix(X_init[Sm,])

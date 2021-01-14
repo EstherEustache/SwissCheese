@@ -24,7 +24,11 @@ the dataframe of nonrespondents with NA values imputed.
 Impute missing values with one of the nearest respondents using the cube method.
 }
 \examples{
-#A faire
+Xr  <- rbind(c(0.1,0.3,0.4,0.1), c(0.1,0.3,0.2,0.1), c(0.1,0.2,0.3,0.1), c(0.2,0.3,0.2,0.3), c(0.1,0.1,0.2,0.1))
+Xm  <- rbind(c(NA,0.1,NA,0.1), c(0.1,NA,0.2,NA))
+knn <- indKnn(Xr,Xm)
+psi <- calibrateKnn(Xr,Xm, knn = knn)
+cubeImput(Xr,Xm, knn, psi)
 
 }
 \references{

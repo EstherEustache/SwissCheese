@@ -1,7 +1,6 @@
 #' @title Random hot deck imputation of Swiss cheese nonresponse
 #'
-#' @description Impute each nonrespondent unit by selecting randomly a donor among its nearest respondents in term of Euclidean distance
-#' (see (Andridge and Little, 2004)).
+#' @description Impute each nonrespondent unit by selecting randomly a donor among its nearest respondents in term of Euclidean distance.
 #'
 #'
 #'
@@ -11,7 +10,6 @@
 #'
 #'
 #' @return the new dataframe with NA values imputed.
-#' @export
 #'
 #'
 #'
@@ -21,9 +19,15 @@
 #'
 #' @seealso \link{indKnn}
 #'
+#' @references
+#' Rebecca R. Andridge, Roderick J. A. Little (2010). A Review of Hot Deck Imputation for Survey Non-response. International Statistical Review, Vol. 78, Issue 1, pp. 40-64.
 #'
 #'
-#' @examples  #A faire
+#' @examples
+#' Xr  <- rbind(c(0.1,0.3,0.4,0.1), c(0.1,0.3,0.2,0.1), c(0.1,0.2,0.3,0.1), c(0.2,0.3,0.2,0.3), c(0.1,0.1,0.2,0.1))
+#' Xm  <- rbind(c(NA,0.1,NA,0.1), c(0.1,NA,0.2,NA))
+#' X <- rbind(Xr,Xm)
+#' hotDeckImput(X)
 #'
 #' @export
 

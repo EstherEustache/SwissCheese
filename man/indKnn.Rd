@@ -7,9 +7,9 @@
 indKnn(Xr, Xm)
 }
 \arguments{
-\item{Xr}{a matrix without NA values. Rows correspond to respondent units.}
+\item{Xr}{a matrix without NA values. The rows correspond to respondent units.}
 
-\item{Xm}{a matrix with some NA values. Rows correspond to nonrespondent units.}
+\item{Xm}{a matrix with at least one NA value on each of its rows. The rows correspond to nonrespondent units.}
 }
 \value{
 a matrix containing in columns the nonrespondent units and in rows the nearest respondent units for each nonrespondent in decreasing rank.
@@ -19,7 +19,9 @@ Find the k-nearest neighbors of nonrespondent units among respondent units, in t
 The function \code{\link[FNN:knn]{knn}} from the package \code{KNN} is used.
 }
 \examples{
- #A faire
+Xr  <- rbind(c(0.1,0.3,0.4,0.1), c(0.1,0.3,0.2,0.1), c(0.1,0.2,0.3,0.1), c(0.2,0.3,0.2,0.3), c(0.1,0.1,0.2,0.1))
+Xm  <- rbind(c(NA,0.1,NA,0.1), c(0.1,NA,0.2,NA))
+knn <- indKnn(Xr,Xm)
 
 
 }

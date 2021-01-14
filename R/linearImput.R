@@ -21,7 +21,11 @@
 #'
 #' @seealso \link{indKnn} and \link{calibrateKnn}
 #'
-#' @examples  #A faire
+#' @examples
+#' Xr  <- rbind(c(0.1,0.3,0.4,0.1), c(0.1,0.3,0.2,0.1), c(0.1,0.2,0.3,0.1), c(0.2,0.3,0.2,0.3), c(0.1,0.1,0.2,0.1))
+#' Xm  <- rbind(c(NA,0.1,NA,0.1), c(0.1,NA,0.2,NA))
+#' X <- rbind(Xr,Xm)
+#' linearImput(X)
 #'
 #'
 linearImput <- function(X, d = NULL, k = NULL, tol = 1e-3, max_iter = 2000){
@@ -95,8 +99,6 @@ linearImput <- function(X, d = NULL, k = NULL, tol = 1e-3, max_iter = 2000){
     Xm_init[i,] <- R[i,]*Xm_init[i,] + (1-R[i,])*colSums(psi[i,]*Xr_init[knn_k[i,],])
   }
   X_init[Sm,] <- Xm_init
-
-  #if((!is.null(k_init)) && (k>k_init)){ warning('K must have been increased.') }
 
   return(list(X_new = X_init, k = k))
 }

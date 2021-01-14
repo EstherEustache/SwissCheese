@@ -2,14 +2,14 @@
 % Please edit documentation in R/calibrateKnn.R
 \name{calibrateKnn}
 \alias{calibrateKnn}
-\title{calib2}
+\title{Compute imputation probabilities matrix}
 \usage{
 calibrateKnn(Xr, Xm, dr = NULL, dm = NULL, knn, tol = 0.01, max_iter = 2000)
 }
 \arguments{
 \item{Xr}{a matrix without NA values. The rows correspond to respondent units.}
 
-\item{Xm}{a matrix with at least one NA values on each of its rows. The rows correspond to nonrespondent units.}
+\item{Xm}{a matrix with at least one NA value on each of its rows. The rows correspond to nonrespondent units.}
 
 \item{dr}{a vector containing the sampling weights of the respondent units in \code{Xr}. If NULL (default), all sampling weights are equal to 1.}
 
@@ -22,7 +22,7 @@ calibrateKnn(Xr, Xm, dr = NULL, dm = NULL, knn, tol = 0.01, max_iter = 2000)
 \item{max_iter}{the maximum number of iterations to consider convergence.}
 }
 \value{
-a matrix with the same length as \code{knn} containing imputation probabilities for each neighbors.
+a matrix with the same size as \code{knn} containing imputation probabilities for each neighbor. If NULL, the constraints of calibration cannot be satisfied.
 }
 \description{
 Compute imputation probabilities matrix satisfying calibration equations.
@@ -37,10 +37,13 @@ and summing to one for each nonrespondent. The method is based on four requireme
       \item The donors is selected among the \code{k} nearest neighbors of units with missing values.
       \item If the observed values of the nonrespondents were imputed, the total estimator of each variable will remain unchanged.
 \enumerate
-See the package's vignette to a complete description of the calibration constraints.
+See the vignette of the package to a complete description of the calibration constraints.
 }
 \examples{
-#A faire
+Xr  <- rbind(c(0.1,0.3,0.4,0.1), c(0.1,0.3,0.2,0.1), c(0.1,0.2,0.3,0.1), c(0.2,0.3,0.2,0.3), c(0.1,0.1,0.2,0.1))
+Xm  <- rbind(c(NA,0.1,NA,0.1), c(0.1,NA,0.2,NA))
+knn <- indKnn(Xr,Xm)
+calibrateKnn(Xr,Xm, knn = knn)
 
 }
 \seealso{

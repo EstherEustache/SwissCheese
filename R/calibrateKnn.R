@@ -1,4 +1,4 @@
-#' @title calib2
+#' @title Compute imputation probabilities matrix
 #'
 #' @description Compute imputation probabilities matrix satisfying calibration equations.
 #' Only the \code{k}-nearest respondent units of each nonrespondent have non-zero imputation probabilities.
@@ -6,7 +6,7 @@
 #'
 #'
 #' @param Xr a matrix without NA values. The rows correspond to respondent units.
-#' @param Xm a matrix with at least one NA values on each of its rows. The rows correspond to nonrespondent units.
+#' @param Xm a matrix with at least one NA value on each of its rows. The rows correspond to nonrespondent units.
 #' @param dr a vector containing the sampling weights of the respondent units in \code{Xr}. If NULL (default), all sampling weights are equal to 1.
 #' @param dm a vector containing the sampling weights of the nonrespondent units in \code{Xm}. If NULL (default), all sampling weights are equal to 1.
 #' @param knn a matrix that is returned by the function \code{\link{indKnn}}.
@@ -25,10 +25,10 @@
 #'       \item The donors is selected among the \code{k} nearest neighbors of units with missing values.
 #'       \item If the observed values of the nonrespondents were imputed, the total estimator of each variable will remain unchanged.
 #' \enumerate
-#' See the package's vignette to a complete description of the calibration constraints.
+#' See the vignette of the package to a complete description of the calibration constraints.
 #'
 #'
-#' @return a matrix with the same length as \code{knn} containing imputation probabilities for each neighbors.
+#' @return a matrix with the same size as \code{knn} containing imputation probabilities for each neighbor. If NULL, the constraints of calibration cannot be satisfied.
 #'
 #'
 #'
@@ -38,7 +38,11 @@
 #'
 #' @seealso \link{indKnn}
 #'
-#' @examples #A faire
+#' @examples
+#' Xr  <- rbind(c(0.1,0.3,0.4,0.1), c(0.1,0.3,0.2,0.1), c(0.1,0.2,0.3,0.1), c(0.2,0.3,0.2,0.3), c(0.1,0.1,0.2,0.1))
+#' Xm  <- rbind(c(NA,0.1,NA,0.1), c(0.1,NA,0.2,NA))
+#' knn <- indKnn(Xr,Xm)
+#' calibrateKnn(Xr,Xm, knn = knn)
 #'
 #' @export
 
@@ -52,7 +56,7 @@ calibrateKnn <- function(Xr, Xm, dr = NULL, dm = NULL, knn, tol = 1e-2, max_iter
   nm <- nrow(Xm)
   R  <- !is.na(Xm)
   Xm[is.na(Xm)] <- 0
-  J  <- ncol(X)
+  J  <- ncol(Xr)
 
   #------sampling weights
   if (is.null(dr)) { dr <- rep(1, nrow(Xr)) }
