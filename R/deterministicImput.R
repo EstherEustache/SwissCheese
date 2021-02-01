@@ -1,11 +1,11 @@
 #' @title Linear imputation of Swiss cheese nonresponse
 #'
-#' @description Impute missing values using the linear imputation.
+#' @description Impute missing values by means of a deterministic approach on a matrix of imputation probabilities.
 #'
 #'
-#' @param X a matrix with NA values. Rows correspond to units.
+#' @param X a matrix with NA values. The rows correspond to the units.
 #' @param d a vector containing the sampling weights of units. If NULL (default), all sampling weights are equal to 1.
-#' @param k the number of neighbors considered to impute each nonrespondent. If NULL (default), the smaller k
+#' @param k the number of neighbors considered to impute each nonrespondent. If NULL (default), the smaller \code{k}
 #' that makes possible to satisfying calibration equations will be chosen.
 #' @param tol a tolerance parameter. Default value is 1e-3.
 #' @param max_iter the maximum number of iterations to consider convergence.
@@ -17,18 +17,24 @@
 #' @return \code{k} the number of neighbors taken into account.
 #'
 #'
-#' @export
+#' @details
+#' First, the \code{\link{k}} nearest neighbors of each nonrespondent are chosen in terms of Euclidean distance using function \code{\link{indKnn}}.
+#' Next, imputation probabilities from nearest neighbors of each nonrespondent  are computed satisfying some calibration constraints for all variables simultaneously. The matrix of imputation probabilities is computed using the function \code{\link{calibrateKnn}}.
+#' Then, each missing value are imputed by the sum of the multiplication of the imputation probabilities with the corresponding observed values.
 #'
-#' @seealso \link{indKnn} and \link{calibrateKnn}
+#'
+#' @seealso \code{\link{indKnn}} and \code{\link{calibrateKnn}}
 #'
 #' @examples
-#' Xr  <- rbind(c(0.1,0.3,0.4,0.1), c(0.1,0.3,0.2,0.1), c(0.1,0.2,0.3,0.1), c(0.2,0.3,0.2,0.3), c(0.1,0.1,0.2,0.1))
+#' Xr  <- rbind(c(0.1,0.3,0.4,0.1), c(0.1,0.3,0.2,0.1), c(0.1,0.2,0.3,0.1),
+#'              c(0.2,0.3,0.2,0.3), c(0.1,0.1,0.2,0.1))
 #' Xm  <- rbind(c(NA,0.1,NA,0.1), c(0.1,NA,0.2,NA))
 #' X <- rbind(Xr,Xm)
-#' linearImput(X)
+#' deterministicImput(X)
 #'
+#' @export
 #'
-linearImput <- function(X, d = NULL, k = NULL, tol = 1e-3, max_iter = 2000){
+deterministicImput <- function(X, d = NULL, k = NULL, tol = 1e-3, max_iter = 2000){
   ##------------------
   ##  Initialization
   ##------------------

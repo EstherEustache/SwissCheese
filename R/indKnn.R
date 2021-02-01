@@ -4,8 +4,8 @@
 #' The function \code{\link[FNN:knn]{knn}} from the package \code{KNN} is used.
 #'
 #'
-#' @param Xr a matrix without NA values. The rows correspond to respondent units.
-#' @param Xm a matrix with at least one NA value on each of its rows. The rows correspond to nonrespondent units.
+#' @param Xr a matrix without NA values. The rows correspond to the respondent units.
+#' @param Xm a matrix with at least one NA value on each of its rows. The rows correspond to the nonrespondent units.
 #'
 #'
 #' @return a matrix containing in columns the nonrespondent units and in rows the nearest respondent units for each nonrespondent in decreasing rank.
@@ -21,7 +21,8 @@
 #'
 #'
 #' @examples
-#' Xr  <- rbind(c(0.1,0.3,0.4,0.1), c(0.1,0.3,0.2,0.1), c(0.1,0.2,0.3,0.1), c(0.2,0.3,0.2,0.3), c(0.1,0.1,0.2,0.1))
+#' Xr  <- rbind(c(0.1,0.3,0.4,0.1), c(0.1,0.3,0.2,0.1), c(0.1,0.2,0.3,0.1),
+#'              c(0.2,0.3,0.2,0.3), c(0.1,0.1,0.2,0.1))
 #' Xm  <- rbind(c(NA,0.1,NA,0.1), c(0.1,NA,0.2,NA))
 #' knn <- indKnn(Xr,Xm)
 #'

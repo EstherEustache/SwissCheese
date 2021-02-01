@@ -2,12 +2,28 @@ Package: SwissCheese
 Type: Package
 Title: Balanced Imputation for Swiss Cheese Nonresponse
 Version: 0.1.0
-Author: Esther Eustache, Audrey Anne Vall\'ee, Yves Till\'e
+Authors@R: c(
+  person("Esther", "Eustache", email = "esther.eustache@unine.ch",role = c("aut", "cre"),
+    comment = c(ORCID = "0000-0002-5107-454X")
+    ),
+  person("Audrey Anne", "Vallee",role = c("aut"),
+    comment = c(ORCID = "0000-0002-4355-7736")
+    ),
+  person("Yves", "Tille",role = c("aut"),
+    comment = c(ORCID = "0000-0003-0904-5523"))
+  )
+Author: Esther Eustache [aut, cre],
+  Audrey Anne Vall\\'ee [aut],
+  Yves Till\\'e [aut]
 Maintainer: <esther.eustache@unine.ch>
-Description: Balanced K-nearest neighbor imputation (Hasler and Tille, 2016) is extended to the treatment of Swiss cheese nonresponse. The method uses random imputations by donors.
-License: What license is it under?
-Suggests: knitr, rmarkdown
-Imports: sampling, BalancedSampling, FNN
+Description: Balanced K-nearest neighbor imputation (Hasler and Tille, 2016) is extended to the treatment of Swiss cheese nonresponse. The method uses random imputation by donors.
+License: GPL (>=2)
+Suggests: BalancedSampling, 
+  knitr, 
+  rmarkdown
+Imports: sampling, 
+  FNN, 
+  StratifiedSampling
 VignetteBuilder: knitr
 Encoding: UTF-8
 LazyData: true

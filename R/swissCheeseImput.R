@@ -1,33 +1,32 @@
 #' @title Donor imputation of Swiss cheese nonresponse using the cube method
 #'
-#' @description Impute missing values that have not a particular pattern in a dataset by a donor imputation.
-#' It extends the balanced k-nearest neighbors imputation (Hasler and Tille, 2016) to the treatment of the Swiss cheese nonresponse.
+#' @description Impute missing values that have not a particular pattern in the dataset by using a donor imputation.
+#' It extends the balanced k-nearest neighbor imputation (Hasler and Tille, 2016) to the treatment of the Swiss cheese nonresponse.
 #'
 #'
 #'
-#' @param X a matrix with NA values. Rows correspond to units.
+#' @param X a matrix with NA values. The rows correspond to the units.
 #' @param d a vector containing the sampling weights of units. If NULL (default), all sampling weights are equal to 1.
-#' @param k the number of neighbors considered to impute each nonrespondent. If NULL (default), the smaller k
-#' that makes possible to satisfying calibration equations will be chosen.
+#' @param k the number of neighbors considered to impute each nonrespondent. If NULL (default), the smaller \code{k}
+#' that makes possible to satisfy calibration equations will be chosen.
 #' @param tol a tolerance parameter. Default value is 1e-3.
 #' @param max_iter the maximum number of iterations to consider convergence.
 #'
 #'
 #'
 #' @details
-#' First, the \code{k} nearest neighbors of each nonrespondent are chosen in term of Euclidean distance.
+#' First, the \code{k} nearest neighbors of each nonrespondent are chosen in terms of Euclidean distance.
 #' Next, imputation probabilities from nearest neighbors of each nonrespondent  are computed satisfying some calibration constraints for all variables simultaneously
-#' and to sum to one for each nonrespondent. The method of calibration is based on four requirements (see function \link{calibrateKnn} and package vignette
-#' to a complete description of the constraints calibration).
-#' Then, the cube method is used to compute the imputation matrix to choose the donors (see (Deville and Tille, 2004)).
+#' and to sum to one for each nonrespondent. The method of calibration is based on four requirements (see function \code{\link{calibrateKnn}} and article ... on Arxiv
+#' to a complete description of the calibration constraint).
+#' Then, the function \code{\link[StratifiedSampling::stratifiedcube]{StratifiedSampling::stratifiedcube}} from the package \code{StratifiedSampling} is used to compute the final imputation matrix to choose the donors.
+#' This function uses the cube method (see (Deville and Tille, 2004)).
+#'
 #'
 #'
 #' @references
 #' Deville, J. C. and Tille, Y. (2004). Efficient balanced sampling: the cube method. Biometrika, 91(4), 893-912.
 #' \emph{Biometrika}, 91(4), 893-912
-#'
-#' Chauvet, G. and Tille, Y. (2006). A fast algorithm for balanced sampling.
-#' \emph{Computational Statistics}, 21(1), 53-62.
 #'
 #'
 #'
@@ -41,10 +40,11 @@
 #'
 #'
 #'
-#' @seealso \link{indKnn}, \link{calibrateKnn}, \link{cubeImput}, \link{linearImput}
+#' @seealso \code{\link[StratifiedSampling::stratifiedcube]{StratifiedSampling::stratifiedcube}}, \code{\link{indKnn}}, \code{\link{calibrateKnn}}, \code{\link{linearImput}}
 #'
 #' @examples
-#' Xr  <- rbind(c(0.1,0.3,0.4,0.1), c(0.1,0.3,0.2,0.1), c(0.1,0.2,0.3,0.1), c(0.2,0.3,0.2,0.3), c(0.1,0.1,0.2,0.1))
+#' Xr  <- rbind(c(0.1,0.3,0.4,0.1), c(0.1,0.3,0.2,0.1), c(0.1,0.2,0.3,0.1),
+#'              c(0.2,0.3,0.2,0.3), c(0.1,0.1,0.2,0.1))
 #' Xm  <- rbind(c(NA,0.1,NA,0.1), c(0.1,NA,0.2,NA))
 #' X <- rbind(Xr,Xm)
 #' swissCheeseImput(X)
@@ -142,22 +142,16 @@ swissCheeseImput <- function(X, d = NULL, k = NULL, tol = 1e-3, max_iter = 2000)
     } else {
       cvg <- 1
     }
+    print(k)
   }
-
-  #-------Cube method
-  Xm[!R]     <- 0
-  X_psi      <- as.vector(t(psi))
-  X_strat    <- Xr[as.vector(t(knn_k)),]
-  num_strat  <- rep(1:nm, each=k)
-  XX         <- matrix(X_psi, ncol=J, nrow=k*nm, byrow=FALSE) * X_strat * R[num_strat,]
-  psi_cube   <- fbs(cbind(X_psi,XX),as.matrix(num_strat),X_psi)
 
   #------Imputed matrix
   Xm_init     <- as.matrix(X_init[Sm,])
   Xm_init[!R] <- 0
   Xr_init     <- as.matrix(X_init[Sr,])
 
-  psi_cube <- matrix(psi_cube, nrow=nm, ncol=k, byrow=TRUE)
+  psi_cube <- imputMatrixKnn(X_init, psi, knn_k)
+
   for(i in 1:nm){
     Xm_init[i,] <- R[i,]*Xm_init[i,] + (1-R[i,])*Xr_init[knn_k[i,][psi_cube[i,] > (1-1e-6)],]
   }

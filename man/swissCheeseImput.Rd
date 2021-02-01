@@ -7,12 +7,12 @@
 swissCheeseImput(X, d = NULL, k = NULL, tol = 0.001, max_iter = 2000)
 }
 \arguments{
-\item{X}{a matrix with NA values. Rows correspond to units.}
+\item{X}{a matrix with NA values. The rows correspond to the units.}
 
 \item{d}{a vector containing the sampling weights of units. If NULL (default), all sampling weights are equal to 1.}
 
-\item{k}{the number of neighbors considered to impute each nonrespondent. If NULL (default), the smaller k
-that makes possible to satisfying calibration equations will be chosen.}
+\item{k}{the number of neighbors considered to impute each nonrespondent. If NULL (default), the smaller \code{k}
+that makes possible to satisfy calibration equations will be chosen.}
 
 \item{tol}{a tolerance parameter. Default value is 1e-3.}
 
@@ -26,29 +26,31 @@ Returns a list including:
 \code{k} the number of neighbors taken into account.
 }
 \description{
-Impute missing values that have not a particular pattern in a dataset by a donor imputation.
-It extends the balanced k-nearest neighbors imputation (Hasler and Tille, 2016) to the treatment of the Swiss cheese nonresponse.
+Impute missing values that have not a particular pattern in the dataset by using a donor imputation.
+It extends the balanced k-nearest neighbor imputation (Hasler and Tille, 2016) to the treatment of the Swiss cheese nonresponse.
 }
 \details{
-First, the \code{k} nearest neighbors of each nonrespondent are chosen in term of Euclidean distance.
+First, the \code{k} nearest neighbors of each nonrespondent are chosen in terms of Euclidean distance.
 Next, imputation probabilities from nearest neighbors of each nonrespondent  are computed satisfying some calibration constraints for all variables simultaneously
-and to sum to one for each nonrespondent. The method of calibration is based on four requirements (see function \link{calibrateKnn} and package vignette
-to a complete description of the constraints calibration).
-Then, the cube method is used to compute the imputation matrix to choose the donors (see (Deville and Tille, 2004)).
+and to sum to one for each nonrespondent. The method of calibration is based on four requirements (see function \code{\link{calibrateKnn}} and article ... on Arxiv
+to a complete description of the calibration constraint).
+Then, the function \code{\link[StratifiedSampling::stratifiedcube]{StratifiedSampling::stratifiedcube}} from the package \code{StratifiedSampling} is used to compute the final imputation matrix to choose the donors.
+This function uses the cube method (see (Deville and Tille, 2004)).
 }
 \examples{
- #A faire
+Xr  <- rbind(c(0.1,0.3,0.4,0.1), c(0.1,0.3,0.2,0.1), c(0.1,0.2,0.3,0.1),
+             c(0.2,0.3,0.2,0.3), c(0.1,0.1,0.2,0.1))
+Xm  <- rbind(c(NA,0.1,NA,0.1), c(0.1,NA,0.2,NA))
+X <- rbind(Xr,Xm)
+swissCheeseImput(X)
 
 }
 \references{
 Deville, J. C. and Tille, Y. (2004). Efficient balanced sampling: the cube method. Biometrika, 91(4), 893-912.
 \emph{Biometrika}, 91(4), 893-912
-
-Chauvet, G. and Tille, Y. (2006). A fast algorithm for balanced sampling.
-\emph{Computational Statistics}, 21(1), 53-62.
 }
 \seealso{
-\link{indKnn}, \link{calibrateKnn}, \link{cubeImput}, \link{linearImput}
+\code{\link[StratifiedSampling::stratifiedcube]{StratifiedSampling::stratifiedcube}}, \code{\link{indKnn}}, \code{\link{calibrateKnn}}, \code{\link{linearImput}}
 }
 \author{
 Esther Eustache \email{esther.eustache@unine.ch}

@@ -4,9 +4,8 @@
 #'
 #'
 #'
-#' @param X a matrix with NA values. Rows correspond to units.
-#' @param k the number of neighbors considered to impute each nonrespondent. If NULL (default), the minimum between
-#' 30 will be chosen.
+#' @param X a matrix with NA values. The rows correspond to the units.
+#' @param k the number of neighbors considered to impute each nonrespondent. If NULL (default), all the respondents will be considered.
 #'
 #'
 #' @return the new dataframe with NA values imputed.
@@ -16,15 +15,19 @@
 #' @author Esther Eustache \email{esther.eustache@@unine.ch}
 #'
 #'
+#' @details First, the \code{k} nearest neighbors of each nonrespondent are chosen in terms of Euclidean distance using function \code{\link{indKnn}}.
+#' Next, a donor is selected randomly among the neighbors of each nonrespondent in order to impute the missing values.
 #'
-#' @seealso \link{indKnn}
+#'
+#' @seealso \code{\link{indKnn}}
 #'
 #' @references
 #' Rebecca R. Andridge, Roderick J. A. Little (2010). A Review of Hot Deck Imputation for Survey Non-response. International Statistical Review, Vol. 78, Issue 1, pp. 40-64.
 #'
 #'
 #' @examples
-#' Xr  <- rbind(c(0.1,0.3,0.4,0.1), c(0.1,0.3,0.2,0.1), c(0.1,0.2,0.3,0.1), c(0.2,0.3,0.2,0.3), c(0.1,0.1,0.2,0.1))
+#' Xr  <- rbind(c(0.1,0.3,0.4,0.1), c(0.1,0.3,0.2,0.1), c(0.1,0.2,0.3,0.1),
+#'              c(0.2,0.3,0.2,0.3), c(0.1,0.1,0.2,0.1))
 #' Xm  <- rbind(c(NA,0.1,NA,0.1), c(0.1,NA,0.2,NA))
 #' X <- rbind(Xr,Xm)
 #' hotDeckImput(X)

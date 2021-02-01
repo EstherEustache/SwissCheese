@@ -4,10 +4,10 @@
 \alias{calibrateKnn}
 \title{Compute imputation probabilities matrix}
 \usage{
-calibrateKnn(Xr, Xm, dr = NULL, dm = NULL, knn, tol = 0.01, max_iter = 2000)
+calibrateKnn(Xr, Xm, dr = NULL, dm = NULL, knn, tol = 0.001, max_iter = 2000)
 }
 \arguments{
-\item{Xr}{a matrix without NA values. The rows correspond to respondent units.}
+\item{Xr}{a matrix without NA values. The rows correspond to the respondent units.}
 
 \item{Xm}{a matrix with at least one NA value on each of its rows. The rows correspond to nonrespondent units.}
 
@@ -31,23 +31,24 @@ Only the \code{k}-nearest respondent units of each nonrespondent have non-zero i
 \details{
 The main idea is to have imputation probabilities satisfying some calibration constraints for all variables simultaneously
 and summing to one for each nonrespondent. The method is based on four requirements:
-\enumerate
-      \item The imputed values is selected among the completely observed units: a donor imputation method is used.
-      \item Only one donor is selected per nonrespondent: all missing values of a unit should be imputed by the same donor.
-      \item The donors is selected among the \code{k} nearest neighbors of units with missing values.
-      \item If the observed values of the nonrespondents were imputed, the total estimator of each variable will remain unchanged.
-\enumerate
-See the vignette of the package to a complete description of the calibration constraints.
+\itemize{
+ \item{The imputed values is selected among the completely observed units: a donor imputation method is used.}
+ \item{Only one donor is selected per nonrespondent: all missing values of a unit should be imputed by the same donor.}
+ \item{The donors is selected among the \code{k} nearest neighbors of units with missing values.}
+ \item{If the observed values of the nonrespondents were imputed, the total estimator of each variable will remain unchanged.}
+}
+See article ... on Arxiv for a complete description of the calibration constraints.
 }
 \examples{
-Xr  <- rbind(c(0.1,0.3,0.4,0.1), c(0.1,0.3,0.2,0.1), c(0.1,0.2,0.3,0.1), c(0.2,0.3,0.2,0.3), c(0.1,0.1,0.2,0.1))
+Xr  <- rbind(c(0.1,0.3,0.4,0.1), c(0.1,0.3,0.2,0.1), c(0.1,0.2,0.3,0.1),
+             c(0.2,0.3,0.2,0.3), c(0.1,0.1,0.2,0.1))
 Xm  <- rbind(c(NA,0.1,NA,0.1), c(0.1,NA,0.2,NA))
 knn <- indKnn(Xr,Xm)
 calibrateKnn(Xr,Xm, knn = knn)
 
 }
 \seealso{
-\link{indKnn}
+\code{\link{indKnn}}
 }
 \author{
 Esther Eustache \email{esther.eustache@unine.ch}

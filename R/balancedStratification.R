@@ -22,12 +22,6 @@ balancedStratification=function(X, pik, stratum, EPS=1e-6)
     At      <- cbind(m,A[T,])
     pikt[T] <- BalancedSampling::flightphase(pikt[T], as.matrix(pikt[T]*At))
   }
-  for(i in 1:max(stratum)){
-    if(sum(pikt[stratum == i]) < (1-1e-5) ){
-      cat('\nProblem with the flight phase.\n')
-      stop('break')
-    }
-  }
   # landing phase
   p  <- ncol(A)
   for(i in p:1){
