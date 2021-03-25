@@ -1,14 +1,14 @@
 #' @title Compute imputation probabilities matrix
 #'
-#' @description Compute imputation probabilities matrix satisfying calibration equations.
-#' Only the \code{k}-nearest respondent units of each nonrespondent have non-zero imputation probabilities.
+#' @description Compute a matrix of imputation probabilities satisfying some calibration equations.
+#' Only the \code{k}-nearest responding units of each nonrespondent have non-zero imputation probabilities.
 #'
 #'
 #'
-#' @param Xr a matrix without NA values. The rows correspond to the respondent units.
-#' @param Xm a matrix with at least one NA value on each of its rows. The rows correspond to nonrespondent units.
-#' @param dr a vector containing the sampling weights of the respondent units in \code{Xr}. If NULL (default), all sampling weights are equal to 1.
-#' @param dm a vector containing the sampling weights of the nonrespondent units in \code{Xm}. If NULL (default), all sampling weights are equal to 1.
+#' @param Xr a matrix without NA values. The rows correspond to the responding units.
+#' @param Xm a matrix with at least one NA value in each row. The rows correspond to nonrespondent units.
+#' @param dr a vector containing the sampling weights of the respondent units from \code{Xr}. If NULL (default), all sampling weights are equal to 1.
+#' @param dm a vector containing the sampling weights of the nonrespondent units from \code{Xm}. If NULL (default), all sampling weights are equal to 1.
 #' @param knn a matrix that is returned by the function \code{\link{indKnn}}.
 #' @param tol a tolerance parameter. Default value is 1e-3.
 #' @param max_iter the maximum number of iterations to consider convergence.
@@ -17,18 +17,18 @@
 #'
 #'
 #' @details
-#' The main idea is to have imputation probabilities satisfying some calibration constraints for all variables simultaneously
+#' The main idea is to obtain imputation probabilities that are satisfying some calibration constraints for all variables simultaneously
 #' and summing to one for each nonrespondent. The method is based on four requirements:
 #' \itemize{
-##'  \item{The imputed values is selected among the completely observed units: a donor imputation method is used.}
+##'  \item{The imputed values are selected among the completely observed units: a donor imputation method is used.}
 ##'  \item{Only one donor is selected per nonrespondent: all missing values of a unit should be imputed by the same donor.}
-##'  \item{The donors is selected among the \code{k} nearest neighbors of units with missing values.}
+##'  \item{The donors are selected among the \code{k} nearest neighbors of units with missing values.}
 ##'  \item{If the observed values of the nonrespondents were imputed, the total estimator of each variable will remain unchanged.}
 ##' }
 #' See article ... on Arxiv for a complete description of the calibration constraints.
 #'
 #'
-#' @return a matrix with the same size as \code{knn} containing imputation probabilities for each neighbor. If NULL, the constraints of calibration cannot be satisfied.
+#' @return a matrix of the same size as \code{knn} containing imputation probabilities associated with each neighbor. If NULL, the constraints of calibration cannot be satisfied.
 #'
 #'
 #'

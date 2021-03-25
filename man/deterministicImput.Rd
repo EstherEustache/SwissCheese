@@ -9,10 +9,10 @@ deterministicImput(X, d = NULL, k = NULL, tol = 0.001, max_iter = 2000)
 \arguments{
 \item{X}{a matrix with NA values. The rows correspond to the units.}
 
-\item{d}{a vector containing the sampling weights of units. If NULL (default), all sampling weights are equal to 1.}
+\item{d}{a vector containing the sampling weights of the units. If NULL (default), all sampling weights are equal to 1.}
 
-\item{k}{the number of neighbors considered to impute each nonrespondent. If NULL (default), the smaller \code{k}
-that makes possible to satisfying calibration equations will be chosen.}
+\item{k}{the number of neighbors considered to impute each nonrespondent. If NULL (default), the smallest \code{k}
+allowing a solution to the calibration equations will be chosen.}
 
 \item{tol}{a tolerance parameter. Default value is 1e-3.}
 
@@ -26,12 +26,14 @@ Returns a list including:
 \code{k} the number of neighbors taken into account.
 }
 \description{
-Impute missing values by means of a deterministic approach on a matrix of imputation probabilities.
+Impute missing values by means of a deterministic approach using a matrix of imputation probabilities.
 }
 \details{
-First, the \code{\link{k}} nearest neighbors of each nonrespondent are chosen in terms of Euclidean distance using function \code{\link{indKnn}}.
-Next, imputation probabilities from nearest neighbors of each nonrespondent  are computed satisfying some calibration constraints for all variables simultaneously. The matrix of imputation probabilities is computed using the function \code{\link{calibrateKnn}}.
-Then, each missing value are imputed by the sum of the multiplication of the imputation probabilities with the corresponding observed values.
+First, the \code{\link{k}} nearest neighbors of each nonrespondent are chosen using the Euclidean distance in the function \code{\link{indKnn}}.
+Next, imputation probabilities are computed for the nearest neighbors of each nonrespondent.
+The imputation probabilities satisfy some calibration constraints for all variables simultaneously.
+The matrix of imputation probabilities is computed using the function \code{\link{calibrateKnn}}.
+Then, each missing value is imputed by the sum of the multiplication of the imputation probabilities and the corresponding observed values.
 }
 \examples{
 Xr  <- rbind(c(0.1,0.3,0.4,0.1), c(0.1,0.3,0.2,0.1), c(0.1,0.2,0.3,0.1),

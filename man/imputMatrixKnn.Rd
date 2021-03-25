@@ -2,7 +2,7 @@
 % Please edit documentation in R/imputMatrixKnn.R
 \name{imputMatrixKnn}
 \alias{imputMatrixKnn}
-\title{Compute imputation matrix}
+\title{Compute an imputation matrix}
 \usage{
 imputMatrixKnn(X, psi, knn)
 }
@@ -14,11 +14,11 @@ imputMatrixKnn(X, psi, knn)
 \item{Xr}{a matrix without NA values. The rows correspond to the respondent units.}
 }
 \value{
-the imputation matrix with the same size as matrix \code{\link{knn}} composed of 0s and 1s specifying which nearest neighbors will imput each nonrespondent.
+The imputation matrix with the same size as matrix \code{\link{knn}} composed of 0s and 1s specifying which respondent will imput each nonrespondent.
 }
 \description{
-Compute imputation probabilities matrix using the cube method and balancing on a matrix of imputation probabilities.
-Only the \code{k}-nearest respondent units of each nonrespondent have non-zero imputation probabilities.
+Compute an imputation matrix using the cube method and a matrix of imputation probabilities.
+Only the \code{k}-nearest respondent of each nonrespondent have non-zero imputation probabilities.
 }
 \details{
 The function \code{\link[StratifiedSampling::stratifiedcube]{StratifiedSampling::stratifiedcube}} from the package \code{StratifiedSampling} is used to compute the imputation matrix to choose the donors.

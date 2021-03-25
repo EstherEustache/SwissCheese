@@ -1,12 +1,12 @@
 #' @title Donor imputation of Swiss cheese nonresponse using the cube method
 #'
-#' @description Impute missing values that have not a particular pattern in the dataset by using a donor imputation.
-#' It extends the balanced k-nearest neighbor imputation (Hasler and Tille, 2016) to the treatment of the Swiss cheese nonresponse.
+#' @description Impute missing values that have no particular pattern by using a donor imputation method.
+#' It extends the balanced \code{k}-nearest neighbor imputation (Hasler and Tille, 2016) to the treatment of the Swiss cheese nonresponse.
 #'
 #'
 #'
 #' @param X a matrix with NA values. The rows correspond to the units.
-#' @param d a vector containing the sampling weights of units. If NULL (default), all sampling weights are equal to 1.
+#' @param d a vector containing the sampling weights of the units. If NULL (default), all sampling weights are equal to 1.
 #' @param k the number of neighbors considered to impute each nonrespondent. If NULL (default), the smaller \code{k}
 #' that makes possible to satisfy calibration equations will be chosen.
 #' @param tol a tolerance parameter. Default value is 1e-3.
@@ -15,10 +15,11 @@
 #'
 #'
 #' @details
-#' First, the \code{k} nearest neighbors of each nonrespondent are chosen in terms of Euclidean distance.
-#' Next, imputation probabilities from nearest neighbors of each nonrespondent  are computed satisfying some calibration constraints for all variables simultaneously
-#' and to sum to one for each nonrespondent. The method of calibration is based on four requirements (see function \code{\link{calibrateKnn}} and article ... on Arxiv
-#' to a complete description of the calibration constraint).
+#' First, the \code{k} nearest neighbors of each nonrespondent are chosen in terms of Euclidean distance using the function \code{\link{indKnn}}.
+#' Next, imputation probabilities are computed for the nearest neighbors of each nonrespondent.
+#' The imputation probabilities satisfy some calibration constraints for all variables simultaneously.
+#' The calibration step is based on four requirements (see function \code{\link{calibrateKnn}} and article ... on Arxiv
+#' for a complete description of the calibration constraints).
 #' Then, the function \code{\link[StratifiedSampling::stratifiedcube]{StratifiedSampling::stratifiedcube}} from the package \code{StratifiedSampling} is used to compute the final imputation matrix to choose the donors.
 #' This function uses the cube method (see (Deville and Tille, 2004)).
 #'

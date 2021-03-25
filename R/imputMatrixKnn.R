@@ -1,7 +1,7 @@
-#' @title Compute imputation matrix
+#' @title Compute an imputation matrix
 #'
-#' @description Compute imputation probabilities matrix using the cube method and balancing on a matrix of imputation probabilities.
-#' Only the \code{k}-nearest respondent units of each nonrespondent have non-zero imputation probabilities.
+#' @description Compute an imputation matrix using the cube method and a matrix of imputation probabilities.
+#' Only the \code{k}-nearest respondent of each nonrespondent have non-zero imputation probabilities.
 #'
 #'
 #'
@@ -23,7 +23,7 @@
 #'
 #'
 #'
-#' @return the imputation matrix with the same size as matrix \code{\link{knn}} composed of 0s and 1s specifying which nearest neighbors will imput each nonrespondent.
+#' @return The imputation matrix with the same size as matrix \code{\link{knn}} composed of 0s and 1s specifying which respondent will imput each nonrespondent.
 #'
 #'
 #'

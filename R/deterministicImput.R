@@ -1,12 +1,12 @@
 #' @title Linear imputation of Swiss cheese nonresponse
 #'
-#' @description Impute missing values by means of a deterministic approach on a matrix of imputation probabilities.
+#' @description Impute missing values by means of a deterministic approach using a matrix of imputation probabilities.
 #'
 #'
 #' @param X a matrix with NA values. The rows correspond to the units.
-#' @param d a vector containing the sampling weights of units. If NULL (default), all sampling weights are equal to 1.
-#' @param k the number of neighbors considered to impute each nonrespondent. If NULL (default), the smaller \code{k}
-#' that makes possible to satisfying calibration equations will be chosen.
+#' @param d a vector containing the sampling weights of the units. If NULL (default), all sampling weights are equal to 1.
+#' @param k the number of neighbors considered to impute each nonrespondent. If NULL (default), the smallest \code{k}
+#' allowing a solution to the calibration equations will be chosen.
 #' @param tol a tolerance parameter. Default value is 1e-3.
 #' @param max_iter the maximum number of iterations to consider convergence.
 #'
@@ -18,9 +18,11 @@
 #'
 #'
 #' @details
-#' First, the \code{\link{k}} nearest neighbors of each nonrespondent are chosen in terms of Euclidean distance using function \code{\link{indKnn}}.
-#' Next, imputation probabilities from nearest neighbors of each nonrespondent  are computed satisfying some calibration constraints for all variables simultaneously. The matrix of imputation probabilities is computed using the function \code{\link{calibrateKnn}}.
-#' Then, each missing value are imputed by the sum of the multiplication of the imputation probabilities with the corresponding observed values.
+#' First, the \code{\link{k}} nearest neighbors of each nonrespondent are chosen using the Euclidean distance in the function \code{\link{indKnn}}.
+#' Next, imputation probabilities are computed for the nearest neighbors of each nonrespondent.
+#' The imputation probabilities satisfy some calibration constraints for all variables simultaneously.
+#' The matrix of imputation probabilities is computed using the function \code{\link{calibrateKnn}}.
+#' Then, each missing value is imputed by the sum of the multiplication of the imputation probabilities and the corresponding observed values.
 #'
 #'
 #' @seealso \code{\link{indKnn}} and \code{\link{calibrateKnn}}

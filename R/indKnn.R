@@ -1,14 +1,14 @@
 #' @title K-nearest neighbors of nonrespondent units
 #'
-#' @description Find the k-nearest neighbors of nonrespondent units among respondent units, in terms of Euclidean distance.
+#' @description Find the k-nearest neighbors of each nonresponding units among responding units, in terms of Euclidean distance.
 #' The function \code{\link[FNN:knn]{knn}} from the package \code{KNN} is used.
 #'
 #'
 #' @param Xr a matrix without NA values. The rows correspond to the respondent units.
-#' @param Xm a matrix with at least one NA value on each of its rows. The rows correspond to the nonrespondent units.
+#' @param Xm a matrix with at least one NA value in each row. The rows correspond to the nonrespondent units.
 #'
 #'
-#' @return a matrix containing in columns the nonrespondent units and in rows the nearest respondent units for each nonrespondent in decreasing rank.
+#' @return A matrix containing in columns the nonrespondent units and in rows the \code{k}-nearest responding units of each nonrespondent in decreasing rank.
 #'
 #'
 #'

@@ -1,6 +1,6 @@
 #' @title Random hot deck imputation of Swiss cheese nonresponse
 #'
-#' @description Impute each nonrespondent unit by selecting randomly a donor among its nearest respondents in term of Euclidean distance.
+#' @description Impute each nonrespondent unit by selecting randomly a donor among its nearest respondents in terms of Euclidean distance.
 #'
 #'
 #'
@@ -8,14 +8,14 @@
 #' @param k the number of neighbors considered to impute each nonrespondent. If NULL (default), all the respondents will be considered.
 #'
 #'
-#' @return the new dataframe with NA values imputed.
+#' @return The new dataframe with NA values imputed.
 #'
 #'
 #'
 #' @author Esther Eustache \email{esther.eustache@@unine.ch}
 #'
 #'
-#' @details First, the \code{k} nearest neighbors of each nonrespondent are chosen in terms of Euclidean distance using function \code{\link{indKnn}}.
+#' @details First, the \code{k} nearest neighbors of each nonrespondent are chosen in terms of Euclidean distance using the function \code{\link{indKnn}}.
 #' Next, a donor is selected randomly among the neighbors of each nonrespondent in order to impute the missing values.
 #'
 #'
