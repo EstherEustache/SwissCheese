@@ -13,8 +13,8 @@ Authors@R: c(
     comment = c(ORCID = "0000-0003-0904-5523"))
   )
 Author: Esther Eustache [aut, cre],
-  Audrey Anne Vall\\'ee [aut],
-  Yves Till\\'e [aut]
+  Audrey Anne Vallee [aut],
+  Yves Tille [aut]
 Maintainer: <esther.eustache@unine.ch>
 Description: Balanced K-nearest neighbor imputation (Hasler and Tille, 2016) is extended to the treatment of Swiss cheese nonresponse. The method uses random imputation by donors.
 License: GPL (>=2)

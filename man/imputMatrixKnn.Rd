@@ -11,7 +11,7 @@ imputMatrixKnn(X, psi, knn)
 
 \item{knn}{a matrix that is returned by the function \code{\link{indKnn}}.}
 
-\item{Xr}{a matrix without NA values. The rows correspond to the respondent units.}
+\item{Xr}{a matrix without NA values. The rows correspond to the responding units.}
 }
 \value{
 The imputation matrix with the same size as matrix \code{\link{knn}} composed of 0s and 1s specifying which respondent will imput each nonrespondent.

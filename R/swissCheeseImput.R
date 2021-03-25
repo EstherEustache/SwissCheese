@@ -68,8 +68,8 @@ swissCheeseImput <- function(X, d = NULL, k = NULL, tol = 1e-3, max_iter = 2000)
   S  <- 1:nrow(X)
   r  <- (!is.na(X))*1                                   # r: matrix of responds
 
-  Sr <- which(apply(r, 1, function(x) !any(0 %in% x)))  # Sr: respondent units
-  Sm <- which(apply(r, 1, function(x) any(0 %in% x)))   # Sm: nonrespondent units
+  Sr <- which(apply(r, 1, function(x) !any(0 %in% x)))  # Sr: responding units
+  Sm <- which(apply(r, 1, function(x) any(0 %in% x)))   # Sm: nonresponding units
   nr <- length(Sr)                                      # nr: number of respondents
   nm <- length(Sm)                                      # nm: number of nonrespondents
 
@@ -89,7 +89,7 @@ swissCheeseImput <- function(X, d = NULL, k = NULL, tol = 1e-3, max_iter = 2000)
   R    <- R[,TEST]
   J    <- ncol(X)
 
-  #------Respondents ordering it term of distance with nonrespondent units in rows
+  #------Respondents ordering it term of distance with nonresponding units in rows
   knn   <- indKnn(Xr, Xm)
 
   #------k

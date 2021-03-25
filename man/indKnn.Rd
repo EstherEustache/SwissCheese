@@ -2,17 +2,17 @@
 % Please edit documentation in R/indKnn.R
 \name{indKnn}
 \alias{indKnn}
-\title{K-nearest neighbors of nonrespondent units}
+\title{K-nearest neighbors of nonresponding units}
 \usage{
 indKnn(Xr, Xm)
 }
 \arguments{
-\item{Xr}{a matrix without NA values. The rows correspond to the respondent units.}
+\item{Xr}{a matrix without NA values. The rows correspond to the responding units.}
 
-\item{Xm}{a matrix with at least one NA value in each row. The rows correspond to the nonrespondent units.}
+\item{Xm}{a matrix with at least one NA value in each row. The rows correspond to the nonresponding units.}
 }
 \value{
-A matrix containing in columns the nonrespondent units and in rows the \code{k}-nearest responding units of each nonrespondent in decreasing rank.
+A matrix containing in columns the nonresponding units and in rows the \code{k}-nearest responding units of each nonrespondent in decreasing rank.
 }
 \description{
 Find the k-nearest neighbors of each nonresponding units among responding units, in terms of Euclidean distance.

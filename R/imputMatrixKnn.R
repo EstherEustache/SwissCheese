@@ -5,7 +5,7 @@
 #'
 #'
 #'
-#' @param Xr a matrix without NA values. The rows correspond to the respondent units.
+#' @param Xr a matrix without NA values. The rows correspond to the responding units.
 #' @param psi a matrix of imputation probabilities  that is returned by the function \code{\link{calibrateKnn}}.
 #' @param knn a matrix that is returned by the function \code{\link{indKnn}}.
 #'
@@ -61,8 +61,8 @@ imputMatrixKnn <- function(X, psi, knn)
   S  <- 1:nrow(X)
   r  <- (!is.na(X))*1                                   # r: matrix of responds
 
-  Sr <- which(apply(r, 1, function(x) !any(0 %in% x)))  # Sr: respondent units
-  Sm <- which(apply(r, 1, function(x) any(0 %in% x)))   # Sm: nonrespondent units
+  Sr <- which(apply(r, 1, function(x) !any(0 %in% x)))  # Sr: responding units
+  Sm <- which(apply(r, 1, function(x) any(0 %in% x)))   # Sm: nonresponding units
   nr <- length(Sr)                                      # nr: number of respondents
   nm <- length(Sm)                                      # nm: number of nonrespondents
 

@@ -1,6 +1,6 @@
 #' @title Random hot deck imputation of Swiss cheese nonresponse
 #'
-#' @description Impute each nonrespondent unit by selecting randomly a donor among its nearest respondents in terms of Euclidean distance.
+#' @description Impute each nonresponding unit by selecting randomly a donor among its nearest respondents in terms of Euclidean distance.
 #'
 #'
 #'
@@ -50,8 +50,8 @@ hotDeckImput <- function(X, k=NULL){
   S  <- 1:nrow(X)
   r  <- (!is.na(X))*1                                   # r: matrix of responds
 
-  Sr <- which(apply(r, 1, function(x) !any(0 %in% x)))  # Sr: respondent units
-  Sm <- which(apply(r, 1, function(x) any(0 %in% x)))   # Sm: nonrespondent units
+  Sr <- which(apply(r, 1, function(x) !any(0 %in% x)))  # Sr: responding units
+  Sm <- which(apply(r, 1, function(x) any(0 %in% x)))   # Sm: nonresponding units
   nr <- length(Sr)                                      # nr: number of respondents
   nm <- length(Sm)                                      # nm: number of nonrespondents
 

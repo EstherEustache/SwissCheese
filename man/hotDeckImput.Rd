@@ -15,7 +15,7 @@ hotDeckImput(X, k = NULL)
 The new dataframe with NA values imputed.
 }
 \description{
-Impute each nonrespondent unit by selecting randomly a donor among its nearest respondents in terms of Euclidean distance.
+Impute each nonresponding unit by selecting randomly a donor among its nearest respondents in terms of Euclidean distance.
 }
 \details{
 First, the \code{k} nearest neighbors of each nonrespondent are chosen in terms of Euclidean distance using the function \code{\link{indKnn}}.
