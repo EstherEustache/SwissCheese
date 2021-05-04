@@ -39,7 +39,7 @@ Then, each missing value is imputed by the sum of the multiplication of the impu
 Xr  <- rbind(c(0.1,0.3,0.4,0.1), c(0.1,0.3,0.2,0.1), c(0.1,0.2,0.3,0.1),
              c(0.2,0.3,0.2,0.3), c(0.1,0.1,0.2,0.1))
 Xm  <- rbind(c(NA,0.1,NA,0.1), c(0.1,NA,0.2,NA))
-X <- rbind(Xr,Xm)
+X   <- rbind(Xr,Xm)
 deterministicImput(X)
 
 }

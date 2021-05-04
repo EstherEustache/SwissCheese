@@ -15,7 +15,7 @@ calibrateKnn(Xr, Xm, dr = NULL, dm = NULL, knn, tol = 0.001, max_iter = 2000)
 
 \item{dm}{a vector containing the sampling weights of the nonresponding units from \code{Xm}. If NULL (default), all sampling weights are equal to 1.}
 
-\item{knn}{a submatrix of the matrix returned by the function \code{\link{indKnn}}, with \code{k} columns corresponding to the nearest neighbors.}
+\item{knn}{a submatrix of the matrix returned by the function \code{\link{indKnn}}, with the \code{k} columns corresponding to the nearest neighbors.}
 
 \item{tol}{a tolerance parameter. Default value is 1e-3.}
 

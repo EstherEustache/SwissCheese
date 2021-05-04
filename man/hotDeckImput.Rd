@@ -2,7 +2,7 @@
 % Please edit documentation in R/hotdeckImput.R
 \name{hotDeckImput}
 \alias{hotDeckImput}
-\title{Random hot deck imputation of Swiss cheese nonresponse}
+\title{Random hot deck \code{k} nearest neighbor imputation of Swiss cheese nonresponse}
 \usage{
 hotDeckImput(X, k = NULL)
 }
@@ -12,7 +12,7 @@ hotDeckImput(X, k = NULL)
 \item{k}{the number of neighbors considered to impute each nonrespondent. If NULL (default), all the respondents will be considered.}
 }
 \value{
-The new dataframe with NA values imputed.
+The imputed matrix of \code{X}.
 }
 \description{
 Impute each nonresponding unit by selecting randomly a donor among its nearest respondents in terms of Euclidean distance.
@@ -22,11 +22,11 @@ First, the \code{k} nearest neighbors of each nonrespondent are chosen in terms 
 Next, a donor is selected randomly among the neighbors of each nonrespondent in order to impute the missing values.
 }
 \examples{
-Xr  <- rbind(c(0.1,0.3,0.4,0.1), c(0.1,0.3,0.2,0.1), c(0.1,0.2,0.3,0.1),
+Xr <- rbind(c(0.1,0.3,0.4,0.1), c(0.1,0.3,0.2,0.1), c(0.1,0.2,0.3,0.1),
              c(0.2,0.3,0.2,0.3), c(0.1,0.1,0.2,0.1))
-Xm  <- rbind(c(NA,0.1,NA,0.1), c(0.1,NA,0.2,NA))
-X <- rbind(Xr,Xm)
-hotDeckImput(X)
+Xm <- rbind(c(NA,0.1,NA,0.1), c(0.1,NA,0.2,NA))
+X  <- rbind(Xr,Xm)
+hotDeckImput(X, k = 2)
 
 }
 \references{

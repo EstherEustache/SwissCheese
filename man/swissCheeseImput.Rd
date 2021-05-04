@@ -35,14 +35,14 @@ Next, imputation probabilities are computed for the nearest neighbors of each no
 The imputation probabilities satisfy some calibration constraints for all variables simultaneously.
 The calibration step is based on four requirements (see function \code{\link{calibrateKnn}} and article ... on Arxiv
 for a complete description of the calibration constraints).
-Then, the function \code{\link[StratifiedSampling::stratifiedcube]{StratifiedSampling::stratifiedcube}} from the package \code{StratifiedSampling} is used to compute the final imputation matrix to choose the donors.
+Then, the function \code{\link[StratifiedSampling::stratifiedcube]{StratifiedSampling::stratifiedcube}} from the package \code{StratifiedSampling} is used to compute the final imputation matrix to select donors.
 This function uses the cube method (see (Deville and Tille, 2004)).
 }
 \examples{
 Xr  <- rbind(c(0.1,0.3,0.4,0.1), c(0.1,0.3,0.2,0.1), c(0.1,0.2,0.3,0.1),
              c(0.2,0.3,0.2,0.3), c(0.1,0.1,0.2,0.1))
 Xm  <- rbind(c(NA,0.1,NA,0.1), c(0.1,NA,0.2,NA))
-X <- rbind(Xr,Xm)
+X   <- rbind(Xr,Xm)
 swissCheeseImput(X)
 
 }
@@ -51,7 +51,7 @@ Deville, J. C. and Tille, Y. (2004). Efficient balanced sampling: the cube metho
 \emph{Biometrika}, 91(4), 893-912
 }
 \seealso{
-\code{\link[StratifiedSampling::stratifiedcube]{StratifiedSampling::stratifiedcube}}, \code{\link{indKnn}}, \code{\link{calibrateKnn}}, \code{\link{linearImput}}
+\code{\link[StratifiedSampling::stratifiedcube]{StratifiedSampling::stratifiedcube}}, \code{\link{indKnn}}, \code{\link{calibrateKnn}}
 }
 \author{
 Esther Eustache \email{esther.eustache@unine.ch}

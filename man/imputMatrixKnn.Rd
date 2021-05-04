@@ -7,11 +7,11 @@
 imputMatrixKnn(X, psi, knn)
 }
 \arguments{
-\item{psi}{a matrix of imputation probabilities  that is returned by the function \code{\link{calibrateKnn}}.}
+\item{X}{a matrix with NA values. The rows correspond to the units.}
 
-\item{knn}{a matrix that is returned by the function \code{\link{indKnn}}.}
+\item{psi}{a matrix of imputation probabilities returned by the function \code{\link{calibrateKnn}}.}
 
-\item{Xr}{a matrix without NA values. The rows correspond to the responding units.}
+\item{knn}{a submatrix of the matrix returned by the function \code{\link{indKnn}}, with the \code{k} columns corresponding to the nearest neighbors.}
 }
 \value{
 The imputation matrix with the same size as matrix \code{\link{knn}} composed of 0s and 1s specifying which respondent will imput each nonrespondent.
@@ -21,7 +21,7 @@ Compute an imputation matrix using the cube method and a matrix of imputation pr
 Only the \code{k}-nearest respondent of each nonrespondent have non-zero imputation probabilities.
 }
 \details{
-The function \code{\link[StratifiedSampling::stratifiedcube]{StratifiedSampling::stratifiedcube}} from the package \code{StratifiedSampling} is used to compute the imputation matrix to choose the donors.
+The function \code{\link[StratifiedSampling::stratifiedcube]{StratifiedSampling::stratifiedcube}} from the package \code{StratifiedSampling} is used to compute the imputation matrix to select donors.
 This function uses the cube method (see (Deville and Tille, 2004)).
 }
 \examples{
@@ -29,7 +29,7 @@ Xr  <- rbind(c(0.1,0.3,0.4,0.1), c(0.1,0.3,0.2,0.1), c(0.1,0.2,0.3,0.1),
              c(0.2,0.3,0.2,0.3), c(0.1,0.1,0.2,0.1), c(0.3,0.1,0.1,0.1))
 Xm  <- rbind(c(NA,0.1,NA,0.1), c(0.1,NA,0.2,NA))
 X   <- rbind(Xr,Xm)
-knn <- indKnn(Xr,Xm)[,1:5]
+knn <- indKnn(Xr,Xm)[,1:5] #--the k = 5 nearest neighbors
 psi <- calibrateKnn(Xr, Xm, knn = knn)
 imputMatrixKnn(X, psi, knn)
 
