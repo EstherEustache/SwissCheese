@@ -14,14 +14,14 @@ imputMatrixKnn(X, psi, knn)
 \item{knn}{a submatrix of the matrix returned by the function \code{\link{indKnn}}, with the \code{k} columns corresponding to the nearest neighbors.}
 }
 \value{
-The imputation matrix with the same size as matrix \code{\link{knn}} composed of 0s and 1s specifying which respondent will imput each nonrespondent.
+The imputation matrix with the same size as matrix \code{knn} composed of 0s and 1s specifying which respondent will imput each nonrespondent.
 }
 \description{
 Compute an imputation matrix using the cube method and a matrix of imputation probabilities.
 Only the \code{k}-nearest respondent of each nonrespondent have non-zero imputation probabilities.
 }
 \details{
-The function \code{\link[StratifiedSampling::stratifiedcube]{StratifiedSampling::stratifiedcube}} from the package \code{StratifiedSampling} is used to compute the imputation matrix to select donors.
+The function \code{\link[StratifiedSampling:stratifiedcube]{StratifiedSampling::stratifiedcube}} from the package \code{StratifiedSampling} is used to compute the imputation matrix to select donors.
 This function uses the cube method (see (Deville and Tille, 2004)).
 }
 \examples{
@@ -39,7 +39,7 @@ Deville, J. C. and Tille, Y. (2004). Efficient balanced sampling: the cube metho
 \emph{Biometrika}, 91(4), 893-912
 }
 \seealso{
-\code{\link[StratifiedSampling::stratifiedcube]{StratifiedSampling::stratifiedcube}}, \code{\link{calibrateKnn}}
+\code{\link[StratifiedSampling:stratifiedcube]{StratifiedSampling::stratifiedcube}}, \code{\link{calibrateKnn}}
 }
 \author{
 Esther Eustache \email{esther.eustache@unine.ch}

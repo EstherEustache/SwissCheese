@@ -1,7 +1,7 @@
 #' @title Ordering neighbors of nonresponding units
 #'
 #' @description Order the responding units for each nonrespondent, in terms of Euclidean distance.
-#' The function \code{\link[FNN:knn]{knn}} from the package \code{KNN} is used.
+#' The function \code{\link[FNN:knn]{FNN::knn}} from the package \code{KNN} is used.
 #'
 #'
 #' @param Xr a matrix without NA values. The rows correspond to the responding units.

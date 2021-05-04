@@ -16,7 +16,7 @@ A matrix containing in rows the nonresponding units and in columns the ordered r
 }
 \description{
 Order the responding units for each nonrespondent, in terms of Euclidean distance.
-The function \code{\link[FNN:knn]{knn}} from the package \code{KNN} is used.
+The function \code{\link[FNN:knn]{FNN::knn}} from the package \code{KNN} is used.
 }
 \examples{
 Xr  <- rbind(c(0.1,0.3,0.4,0.1), c(0.1,0.3,0.2,0.1), c(0.1,0.2,0.3,0.1),

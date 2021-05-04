@@ -12,7 +12,7 @@
 #'
 #'
 #' @details
-#' The function \code{\link[StratifiedSampling::stratifiedcube]{StratifiedSampling::stratifiedcube}} from the package \code{StratifiedSampling} is used to compute the imputation matrix to select donors.
+#' The function \code{\link[StratifiedSampling:stratifiedcube]{StratifiedSampling::stratifiedcube}} from the package \code{StratifiedSampling} is used to compute the imputation matrix to select donors.
 #' This function uses the cube method (see (Deville and Tille, 2004)).
 #'
 #'
@@ -23,7 +23,7 @@
 #'
 #'
 #'
-#' @return The imputation matrix with the same size as matrix \code{\link{knn}} composed of 0s and 1s specifying which respondent will imput each nonrespondent.
+#' @return The imputation matrix with the same size as matrix \code{knn} composed of 0s and 1s specifying which respondent will imput each nonrespondent.
 #'
 #'
 #'
@@ -31,7 +31,7 @@
 #'
 #'
 #'
-#' @seealso \code{\link[StratifiedSampling::stratifiedcube]{StratifiedSampling::stratifiedcube}}, \code{\link{calibrateKnn}}
+#' @seealso \code{\link[StratifiedSampling:stratifiedcube]{StratifiedSampling::stratifiedcube}}, \code{\link{calibrateKnn}}
 #'
 #'
 #' @examples

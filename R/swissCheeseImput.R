@@ -20,7 +20,7 @@
 #' The imputation probabilities satisfy some calibration constraints for all variables simultaneously.
 #' The calibration step is based on four requirements (see function \code{\link{calibrateKnn}} and article ... on Arxiv
 #' for a complete description of the calibration constraints).
-#' Then, the function \code{\link[StratifiedSampling::stratifiedcube]{StratifiedSampling::stratifiedcube}} from the package \code{StratifiedSampling} is used to compute the final imputation matrix to select donors.
+#' Then, the function \code{\link[StratifiedSampling:stratifiedcube]{StratifiedSampling::stratifiedcube}} from the package \code{StratifiedSampling} is used to compute the final imputation matrix to select donors.
 #' This function uses the cube method (see (Deville and Tille, 2004)).
 #'
 #'
@@ -41,7 +41,7 @@
 #'
 #'
 #'
-#' @seealso \code{\link[StratifiedSampling::stratifiedcube]{StratifiedSampling::stratifiedcube}}, \code{\link{indKnn}}, \code{\link{calibrateKnn}}
+#' @seealso \code{\link[StratifiedSampling:stratifiedcube]{StratifiedSampling::stratifiedcube}}, \code{\link{indKnn}}, \code{\link{calibrateKnn}}
 #'
 #' @examples
 #' Xr  <- rbind(c(0.1,0.3,0.4,0.1), c(0.1,0.3,0.2,0.1), c(0.1,0.2,0.3,0.1),
@@ -102,7 +102,7 @@ swissCheeseImput <- function(X, d = NULL, k = NULL, tol = 1e-3, max_iter = 2000)
   ##-----------------------------------
   cvg       <- 0
   donor_max <- rep(0,J)
-  tot_m     <- colSums(na.omit(Xm))
+  tot_m     <- colSums(stats::na.omit(Xm))
 
   while (cvg == 0) {
     #----Test if k is not to big

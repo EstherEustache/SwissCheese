@@ -103,7 +103,7 @@ calibrateKnn <- function(Xr, Xm, dr = NULL, dm = NULL, knn, tol = 1e-3, max_iter
         lambda <- 0
         c      <- 0
         div    <- 1
-        V      <- var(Xr[,j])
+        V      <- stats::var(Xr[,j])
 
         while((div > 1e-10) & (c < 100)){
           c      <- c+1

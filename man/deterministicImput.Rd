@@ -29,7 +29,7 @@ Returns a list including:
 Impute missing values by means of a deterministic approach using a matrix of imputation probabilities.
 }
 \details{
-First, the \code{\link{k}} nearest neighbors of each nonrespondent are chosen using the Euclidean distance in the function \code{\link{indKnn}}.
+First, the \code{k} nearest neighbors of each nonrespondent are chosen using the Euclidean distance in the function \code{\link{indKnn}}.
 Next, imputation probabilities are computed for the nearest neighbors of each nonrespondent.
 The imputation probabilities satisfy some calibration constraints for all variables simultaneously.
 The matrix of imputation probabilities is computed using the function \code{\link{calibrateKnn}}.
