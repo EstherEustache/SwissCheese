@@ -1,6 +1,6 @@
-#' @title K-nearest neighbors of nonresponding units
+#' @title Ordering neighbors of nonresponding units
 #'
-#' @description Find the k-nearest neighbors of each nonresponding units among responding units, in terms of Euclidean distance.
+#' @description Order the responding units for each nonrespondent, in terms of Euclidean distance.
 #' The function \code{\link[FNN:knn]{knn}} from the package \code{KNN} is used.
 #'
 #'
@@ -8,7 +8,7 @@
 #' @param Xm a matrix with at least one NA value in each row. The rows correspond to the nonresponding units.
 #'
 #'
-#' @return A matrix containing in columns the nonresponding units and in rows the \code{k}-nearest responding units of each nonrespondent in decreasing rank.
+#' @return A matrix containing in rows the nonresponding units and in columns the ordered responding units in increasing rank.
 #'
 #'
 #'

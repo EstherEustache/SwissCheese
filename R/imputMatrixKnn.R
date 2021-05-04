@@ -5,14 +5,14 @@
 #'
 #'
 #'
-#' @param Xr a matrix without NA values. The rows correspond to the responding units.
-#' @param psi a matrix of imputation probabilities  that is returned by the function \code{\link{calibrateKnn}}.
-#' @param knn a matrix that is returned by the function \code{\link{indKnn}}.
+#' @param X a matrix with NA values. The rows correspond to the units.
+#' @param psi a matrix of imputation probabilities returned by the function \code{\link{calibrateKnn}}.
+#' @param knn a submatrix of the matrix returned by the function \code{\link{indKnn}}, with the \code{k} columns corresponding to the nearest neighbors.
 #'
 #'
 #'
 #' @details
-#' The function \code{\link[StratifiedSampling::stratifiedcube]{StratifiedSampling::stratifiedcube}} from the package \code{StratifiedSampling} is used to compute the imputation matrix to choose the donors.
+#' The function \code{\link[StratifiedSampling::stratifiedcube]{StratifiedSampling::stratifiedcube}} from the package \code{StratifiedSampling} is used to compute the imputation matrix to select donors.
 #' This function uses the cube method (see (Deville and Tille, 2004)).
 #'
 #'
@@ -39,7 +39,7 @@
 #'              c(0.2,0.3,0.2,0.3), c(0.1,0.1,0.2,0.1), c(0.3,0.1,0.1,0.1))
 #' Xm  <- rbind(c(NA,0.1,NA,0.1), c(0.1,NA,0.2,NA))
 #' X   <- rbind(Xr,Xm)
-#' knn <- indKnn(Xr,Xm)[,1:5]
+#' knn <- indKnn(Xr,Xm)[,1:5] #--the k = 5 nearest neighbors
 #' psi <- calibrateKnn(Xr, Xm, knn = knn)
 #' imputMatrixKnn(X, psi, knn)
 #'

@@ -20,7 +20,7 @@
 #' The imputation probabilities satisfy some calibration constraints for all variables simultaneously.
 #' The calibration step is based on four requirements (see function \code{\link{calibrateKnn}} and article ... on Arxiv
 #' for a complete description of the calibration constraints).
-#' Then, the function \code{\link[StratifiedSampling::stratifiedcube]{StratifiedSampling::stratifiedcube}} from the package \code{StratifiedSampling} is used to compute the final imputation matrix to choose the donors.
+#' Then, the function \code{\link[StratifiedSampling::stratifiedcube]{StratifiedSampling::stratifiedcube}} from the package \code{StratifiedSampling} is used to compute the final imputation matrix to select donors.
 #' This function uses the cube method (see (Deville and Tille, 2004)).
 #'
 #'
