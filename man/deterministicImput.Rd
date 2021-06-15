@@ -4,26 +4,15 @@
 \alias{deterministicImput}
 \title{Linear imputation of Swiss cheese nonresponse}
 \usage{
-deterministicImput(X, d = NULL, k = NULL, tol = 0.001, max_iter = 2000)
+deterministicImput(X, d = NULL, k = 5, w = NULL)
 }
 \arguments{
 \item{X}{a matrix with NA values. The rows correspond to the units.}
 
 \item{d}{a vector containing the sampling weights of the units. If NULL (default), all sampling weights are equal to 1.}
-
-\item{k}{the number of neighbors considered to impute each nonrespondent. If NULL (default), the smallest \code{k}
-allowing a solution to the calibration equations will be chosen.}
-
-\item{tol}{a tolerance parameter. Default value is 1e-3.}
-
-\item{max_iter}{the maximum number of iterations to consider convergence.}
 }
 \value{
-Returns a list including:
-
-\code{X_new} the imputed matrix of \code{X}.
-
-\code{k} the number of neighbors taken into account.
+the imputed matrix of \code{X}.
 }
 \description{
 Impute missing values by means of a deterministic approach using a matrix of imputation probabilities.
@@ -42,7 +31,4 @@ Xm  <- rbind(c(NA,0.1,NA,0.1), c(0.1,NA,0.2,NA))
 X   <- rbind(Xr,Xm)
 deterministicImput(X)
 
-}
-\seealso{
-\code{\link{indKnn}} and \code{\link{calibrateKnn}}
 }

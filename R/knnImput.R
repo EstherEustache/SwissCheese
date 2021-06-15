@@ -5,7 +5,7 @@
 #'
 #'
 #' @param X a matrix with NA values. The rows correspond to the units.
-#' @param k the number of neighbors considered to impute each nonrespondent. If NULL (default), all the respondents will be considered.
+#' @param k
 #'
 #'
 #' @return The imputed matrix of \code{X}.
@@ -34,7 +34,7 @@
 #'
 #' @export
 
-hotDeckImput <- function(X, k=NULL){
+knnImput <- function(X, k = 5){
   ##------------------
   ##  Initialization
   ##------------------
@@ -46,8 +46,6 @@ hotDeckImput <- function(X, k=NULL){
   }
 
   N  <- nrow(X)
-  J  <- ncol(X)
-  S  <- 1:nrow(X)
   r  <- (!is.na(X))*1                                   # r: matrix of responds
 
   Sr <- which(apply(r, 1, function(x) !any(0 %in% x)))  # Sr: responding units
@@ -55,38 +53,44 @@ hotDeckImput <- function(X, k=NULL){
   nr <- length(Sr)                                      # nr: number of respondents
   nm <- length(Sm)                                      # nm: number of nonrespondents
 
-  R  <- r[Sm,]                      # r: matrix of responds among the nonrespondents
-
-  Xr     <- X[Sr,]
-  Xm     <- X[Sm,]
+  RR  <- r[Sm,]                      # r: matrix of responds among the nonrespondents
+  X[is.na(X)] <- 0
+  Xr <- as.matrix(X[Sr,])
+  Xm <- as.matrix(X[Sm,])
 
   #-------Variable with at least 2 respondents
-  TEST <- which(colSums(R) != 0)
+  TEST <- which(colSums(RR) != 0)
   Xr   <- Xr[,TEST]
   Xm   <- Xm[,TEST]
-  R    <- R[,TEST]
-  J    <- ncol(X)
+  R    <- RR[,TEST]
+  J    <- ncol(Xr)
 
+  ##---Compute the Euclidean distance between respondents and non respondents
+  D <- matrix(rep(0, nr*nm), nrow = nr, ncol = nm)
+  for(i in 1:nm){
+    D[,i] <- (sqrt(rowSums(t(t(Xr)*R[i,]-Xm[i,]*R[i,])^2)))/sum(R[i,])
+  }
+  ##---Find the k nearest neighbours of each nonrespondent
+  range_D <- apply(D, 2, order)
+  knn     <- apply(range_D, 2, function(x) which(x %in% 1:k))
 
   ##----------
   ##  Method
   ##----------
 
-  if(is.null(k)){
-    hotdeck  <- sample(1:nr, nm)
-  } else {
-    knn      <- indKnn(Xr, Xm)
-    hotdeck  <- apply(knn[,1:k], 1, function(x) sample(x,1))
-  }
-
   #-----Imputed matrix
-  Xm_init     <- as.matrix(X_init[Sm,])
-  Xm_init[!R] <- 0
-  Xr_init     <- as.matrix(X_init[Sr,])
+  Xm_init      <- as.matrix(X_init[Sm,])
+  Xm_init[!RR] <- 0
+  Xr_init      <- as.matrix(X_init[Sr,])
 
   for (i in 1:nm) {
-    Xm_init[i,] <- R[i,]*Xm_init[i,] + (1-R[i,])*Xr_init[hotdeck[i],]
+    if( k != 1){
+      Xm_init[i,] <- RR[i,]*Xm_init[i,] + (1-RR[i,])*colMeans(Xr_init[knn[,i],])
+    }else{
+      Xm_init[i,] <- RR[i,]*Xm_init[i,] + (1-RR[i,])*Xr_init[knn[i],]
+    }
   }
+
   X_init[Sm,] <- Xm_init
 
   return(X_init)

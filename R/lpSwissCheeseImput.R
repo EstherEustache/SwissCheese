@@ -1,43 +1,50 @@
-#' @title Linear imputation of Swiss cheese nonresponse
+#' @title Donor imputation of Swiss cheese nonresponse using the cube method
 #'
-#' @description Impute missing values by means of a deterministic approach using a matrix of imputation probabilities.
+#' @description Impute missing values that have no particular pattern by using a donor imputation method.
+#' It extends the balanced \code{k}-nearest neighbor imputation (Hasler and Tille, 2016) to the treatment of the Swiss cheese nonresponse.
+#'
 #'
 #'
 #' @param X a matrix with NA values. The rows correspond to the units.
 #' @param d a vector containing the sampling weights of the units. If NULL (default), all sampling weights are equal to 1.
+#' @param w
+#' @param k
 #'
 #'
 #' @return the imputed matrix of \code{X}.
 #'
 #'
-#' @details
-#' First, the \code{k} nearest neighbors of each nonrespondent are chosen using the Euclidean distance in the function \code{\link{indKnn}}.
-#' Next, imputation probabilities are computed for the nearest neighbors of each nonrespondent.
-#' The imputation probabilities satisfy some calibration constraints for all variables simultaneously.
-#' The matrix of imputation probabilities is computed using the function \code{\link{calibrateKnn}}.
-#' Then, each missing value is imputed by the sum of the multiplication of the imputation probabilities and the corresponding observed values.
 #'
+#' @author Esther Eustache \email{esther.eustache@@unine.ch}
+#'
+#'
+#'
+#' @seealso \code{\link[StratifiedSampling:stratifiedcube]{StratifiedSampling::stratifiedcube}}, \code{\link{indKnn}}, \code{\link{calibrateKnn}}
 #'
 #' @examples
 #' Xr  <- rbind(c(0.1,0.3,0.4,0.1), c(0.1,0.3,0.2,0.1), c(0.1,0.2,0.3,0.1),
 #'              c(0.2,0.3,0.2,0.3), c(0.1,0.1,0.2,0.1))
 #' Xm  <- rbind(c(NA,0.1,NA,0.1), c(0.1,NA,0.2,NA))
 #' X   <- rbind(Xr,Xm)
-#' deterministicImput(X)
+#' lpSwissCheeseImput(X)
 #'
 #' @export
 #'
-deterministicImput <- function(X, d = NULL, k = 5, w = NULL){
+lpSwissCheeseImput <- function(X, d = NULL, w = NULL, k = 5)
+{
   ##------------------
   ##  Initialization
   ##------------------
-  eps = 1e-6
+  eps <- 1e-4
 
   #--- Standardized data
   X_init <- X
-  for(i in 1:ncol(X)){
-    X[!is.na(X[,i]),i] <- as.vector(scale(X[!is.na(X[,i]),i]))
+  var_0 <- which(!apply(X, 2, function(x) sd(x[!is.na(x)]) == 0))
+  X0 <- X[,var_0]
+  for(i in 1:length(var_0)){
+    X0[!is.na(X0[,i]),i] <- as.vector(scale(X0[!is.na(X0[,i]),i]))
   }
+  X[,var_0] <- X0
 
   N  <- nrow(X)
   r  <- (!is.na(X))*1                                   # r: matrix of responds
@@ -69,7 +76,6 @@ deterministicImput <- function(X, d = NULL, k = 5, w = NULL){
   for(i in 1:nm){
     D[((i-1)*nr+1):(i*nr)] <- (sqrt(rowSums(t(t(Xr)*R[i,]*w-Xm[i,]*R[i,]*w)^2)))/sum(R[i,])
   }
-
 
   ##----------------------------
   ##  Imputation probabilities
@@ -110,7 +116,6 @@ deterministicImput <- function(X, d = NULL, k = 5, w = NULL){
                          const.rhs = B,
                          transpose.constraints = TRUE)$solution
 
-
   if(!is.null(k)){
     p  <- 1/k
     II <- NULL
@@ -143,6 +148,7 @@ deterministicImput <- function(X, d = NULL, k = 5, w = NULL){
     }
   }
 
+
   if(!any((apply(A, 1, function(x) sum(x*lp_res))-B)>1e-6)){
     cat('Calibration equation are exactly satisfied.')
   }else{
@@ -158,14 +164,18 @@ deterministicImput <- function(X, d = NULL, k = 5, w = NULL){
 
   M_prob  <- matrix(lp_res, ncol = nm, byrow = F)
 
+  M_X <- matrix(rep(0,nr*nm*nm), ncol = nm)
+  for(v in 1:nm){
+    M_X[((v-1)*nr+1):(v*nr),v] <- lp_res[((v-1)*nr+1):(v*nr)]
+  }
+  M_imput <- matrix(StratifiedSampling::stratifiedcube(X = as.matrix(rep(0,length(lp_res))), strata = rep(1:nm,each = nr), pik = lp_res), byrow = FALSE, ncol = nm)
+
   for(i in 1:nm){
-    Xm_init[i,] <- Rr[i,]*Xm_init[i,] + (1-Rr[i,])*colSums(M_prob[,i]*Xr_init[,])
+    Xm_init[i,] <- Rr[i,]*Xm_init[i,] + (1-Rr[i,])*Xr_init[M_imput[,i] > (1-1e-6),]
   }
   X_init[Sm,] <- Xm_init
 
   return(X_init)
 }
-
-
 
 
