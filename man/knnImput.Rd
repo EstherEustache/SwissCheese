@@ -2,24 +2,20 @@
 % Please edit documentation in R/knnImput.R
 \name{knnImput}
 \alias{knnImput}
-\title{Random hot deck \code{k} nearest neighbor imputation of Swiss cheese nonresponse}
+\title{\code{k}-nearest neighbors imputation.}
 \usage{
 knnImput(X, k = 5)
 }
 \arguments{
 \item{X}{a matrix with NA values. The rows correspond to the units.}
 
-\item{k}{}
+\item{k}{the number of neighbors considered for the imputation.}
 }
 \value{
 The imputed matrix of \code{X}.
 }
 \description{
-Impute each nonresponding unit by selecting randomly a donor among its nearest respondents in terms of Euclidean distance.
-}
-\details{
-First, the \code{k} nearest neighbors of each nonrespondent are chosen in terms of Euclidean distance using the function \code{\link{indKnn}}.
-Next, a donor is selected randomly among the neighbors of each nonrespondent in order to impute the missing values.
+It imputes by the mean of the \code{k}-nearest neighbors of each nonrespondent.
 }
 \examples{
 Xr <- rbind(c(0.1,0.3,0.4,0.1), c(0.1,0.3,0.2,0.1), c(0.1,0.2,0.3,0.1),
@@ -31,9 +27,6 @@ hotDeckImput(X, k = 2)
 }
 \references{
 Rebecca R. Andridge, Roderick J. A. Little (2010). A Review of Hot Deck Imputation for Survey Non-response. International Statistical Review, Vol. 78, Issue 1, pp. 40-64.
-}
-\seealso{
-\code{\link{indKnn}}
 }
 \author{
 Esther Eustache \email{esther.eustache@unine.ch}

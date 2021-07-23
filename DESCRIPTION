@@ -23,7 +23,9 @@ Suggests: BalancedSampling,
   rmarkdown
 Imports: sampling, 
   stats, 
-  StratifiedSampling
+  StratifiedSampling,
+  slam,
+  Rglpk
 VignetteBuilder: knitr
 Encoding: UTF-8
 LazyData: true

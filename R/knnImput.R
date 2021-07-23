@@ -1,11 +1,11 @@
-#' @title Random hot deck \code{k} nearest neighbor imputation of Swiss cheese nonresponse
+#' @title \code{k}-nearest neighbors imputation.
 #'
-#' @description Impute each nonresponding unit by selecting randomly a donor among its nearest respondents in terms of Euclidean distance.
+#' @description It imputes by the mean of the \code{k}-nearest neighbors of each nonrespondent.
 #'
 #'
 #'
 #' @param X a matrix with NA values. The rows correspond to the units.
-#' @param k
+#' @param k the number of neighbors considered for the imputation.
 #'
 #'
 #' @return The imputed matrix of \code{X}.
@@ -15,11 +15,6 @@
 #' @author Esther Eustache \email{esther.eustache@@unine.ch}
 #'
 #'
-#' @details First, the \code{k} nearest neighbors of each nonrespondent are chosen in terms of Euclidean distance using the function \code{\link{indKnn}}.
-#' Next, a donor is selected randomly among the neighbors of each nonrespondent in order to impute the missing values.
-#'
-#'
-#' @seealso \code{\link{indKnn}}
 #'
 #' @references
 #' Rebecca R. Andridge, Roderick J. A. Little (2010). A Review of Hot Deck Imputation for Survey Non-response. International Statistical Review, Vol. 78, Issue 1, pp. 40-64.
