@@ -2,3 +2,5 @@
 
 export(knnImput)
 export(lpSparseSwissCheese)
+export(lpSparseSwissCheese_1)
+export(lpSparseSwissCheese_2)

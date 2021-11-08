@@ -13,10 +13,9 @@
 #' @param k_min minimum number of neighbors with a non-zero imputation probability for each nonrespondent.
 #' @param k_max maximum number of neighbors with a non-zero imputation probability for each nonrespondent.
 #' @param rand if TRUE, the imputation will be random. If FALSE, the imputation will be determinist.
+#' @param test if TRUE, the function checks if the constraints are met.
 #'
 #' @return the imputed matrix of \code{X}.
-#'
-#'
 #'
 #' @author Esther Eustache \email{esther.eustache@@unine.ch}
 #'
@@ -34,7 +33,7 @@
 #'
 #' @export
 #'
-lpSparseSwissCheese <- function(X, d = NULL, w = NULL, k_min = 5, k_max = NULL, rand = TRUE)
+lpSparseSwissCheese <- function(X, d = NULL, w = NULL, k_min = 5, k_max = NULL, rand = TRUE, test = FALSE)
 {
   ##------------------
   ##  Initialization
@@ -79,10 +78,12 @@ lpSparseSwissCheese <- function(X, d = NULL, w = NULL, k_min = 5, k_max = NULL, 
   if(is.null(k_max)){ k_max <- nr }
   D   <- rep(0, k_max*nm)
   ind <- rep(0, k_max*nm)
+  # D_all <- matrix(rep(0, nm*nr), nrow = nr, ncol = nm)
   for(i in 1:nm){
     d_tmp                          <- (sqrt(rowSums(t(t(Xr)*R[i,]*w-Xm[i,]*R[i,]*w)^2)))/sum(R[i,])
     ind[((i-1)*k_max+1):(i*k_max)] <- which(order(d_tmp) %in% (1:k_max))
     D[((i-1)*k_max+1):(i*k_max)]   <- d_tmp[which(order(d_tmp) %in% (1:k_max))]
+    # D_all[,i]                      <- d_tmp
   }
 
 
@@ -110,14 +111,15 @@ lpSparseSwissCheese <- function(X, d = NULL, w = NULL, k_min = 5, k_max = NULL, 
   for(j in 1:ncol(Xm)){
     for(v in 1:nm){
       ind_tmp <- ind[((v-1)*k_max+1):(v*k_max)]
-      C_v <- rep(0,k_max)
+      C_v   <- rep(0,k_max)
+      non_0 <- rep(0,k_max)
       for(u in 1:k_max){
         u_ind  <- ind_tmp[u]
         C_v[u] <- dm[v]*R[v,j]*Xr[u_ind,j]
       }
       non_0    <- abs(C_v)>1e-8
       if(any(non_0)){
-        C_sparse <- rbind(C_sparse, cbind(rep(j, length(non_0)), (((v-1)*k_max+1):(v*k_max))[non_0], C_v[non_0]))
+        C_sparse <- rbind(C_sparse, cbind(rep(j, sum(non_0)), (((v-1)*k_max+1):(v*k_max))[non_0], C_v[non_0]))
       }
     }
   }
@@ -161,15 +163,6 @@ lpSparseSwissCheese <- function(X, d = NULL, w = NULL, k_min = 5, k_max = NULL, 
   ##----------------------
   ##  Imputation matrix
   ##----------------------
-  #--farthest possible donor
-  farthest <- rep(0,nm)
-  for(v in 1:nm){
-    d_tmp       <- D[((v-1)*k_max+1):(v*k_max)] #distance between respondents and nonrespondent=1
-    ind_tmp     <- ind[((v-1)*k_max+1):(v*k_max)]  #indices of the respondents
-    non_0       <- which(lp_res[((v-1)*k_max+1):(v*k_max)]>1e-6)
-    farthest[v] <- max(order(d_tmp)[non_0])
-  }
-
 
   prob_imp     <- rep(0,nr*nm)
   for(v in 1:nm){
@@ -177,6 +170,43 @@ lpSparseSwissCheese <- function(X, d = NULL, w = NULL, k_min = 5, k_max = NULL, 
     prob_tmp[ind[((v-1)*k_max+1):(v*k_max)]] <- lp_res[((v-1)*k_max+1):(v*k_max)]
     prob_imp[((v-1)*nr+1):(v*nr)]            <- prob_tmp
   }
+
+
+
+
+  # ###############################################################################
+  if(test){
+    ##--------CHECK CONSTRAINTS--------##
+
+    ##---Constraints of calibration
+    C  <- matrix(rep(0, nr*nm*ncol(Xm)), nrow = ncol(Xm))
+    for(j in 1:(ncol(Xm))){
+      C1 <- matrix(rep(0, nm*nr), ncol = nm, nrow = nr)
+      for(v in 1:nm){
+        ind_tmp <- ind[((v-1)*k_max+1):(v*k_max)]
+        for(u in 1:k_max){
+          u_ind   <- ind_tmp[u]
+          C1[u_ind,v] <- dm[v]*R[v,j]*Xr[u_ind,j]
+        }
+      }
+      C[j,] <- as.vector(C1)  # matrix of constraints
+    }
+    B1 <- colSums(dm*R*Xm) # matrix of the right hand side of the constraint equation
+
+    ##---constraints of summing to 1
+    I <- matrix(rep(0,nr*nm*nm), nrow = nm)
+    for(v in 1:nm){
+      I[v,((v-1)*nr+1):(v*nr)] <- 1
+    }
+    B2 <- rep(1,nm)
+
+    ##--- concatenation of the constraints
+    A <- rbind(C, I)
+    B <- c(B1, B2)
+
+    if(all(((A%*%prob_imp)-B)<1e-6)){ cat('Constraints of the program are met') }
+  }
+  ####################################################################################
 
   Xm_init      <- as.matrix(X_init[Sm,])
   Xm_init[!Rr] <- 0
@@ -189,19 +219,14 @@ lpSparseSwissCheese <- function(X, d = NULL, w = NULL, k_min = 5, k_max = NULL, 
       Xm_init[i,] <- Rr[i,]*Xm_init[i,] + (1-Rr[i,])*Xr_init[M_imput[,i] > (1-1e-6),]
     }
   }else{
-    M_prob   <- matrix(rep(0,nr*nm), ncol = nm, nrow = nr)
-    for(v in 1:nm){
-      M_prob[ind[((v-1)*k_max+1):(v*k_max)],v] <- prob_imp[((v-1)*k_max+1):(v*k_max)]
-    }
+    M_prob   <- matrix(prob_imp, byrow = FALSE, nrow = nr)
 
     for(i in 1:nm){
       Xm_init[i,] <- Rr[i,]*Xm_init[i,] + (1-Rr[i,])*colSums(M_prob[,i]*Xr_init[,])
     }
   }
 
-  X_init[Sm,] <- Xm_init
-
-  return(X_init)
+  return(X_imp = X_init)
 }
 
 
