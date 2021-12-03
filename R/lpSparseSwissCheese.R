@@ -226,7 +226,9 @@ lpSparseSwissCheese <- function(X, d = NULL, w = NULL, k_min = 5, k_max = NULL, 
     }
   }
 
-  return(X_imp = X_init)
+  X_init[Sm,] <- Xm_init
+
+  return(X_init)
 }
 
 
